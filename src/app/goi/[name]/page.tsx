@@ -18,7 +18,7 @@ export default function GoiEntries({ params }: { params: { name: string } }) {
                 </ListItem>)}
             <ListItem>
                 <ListItemButton>
-                    <Link href="/goi/new" style={{ textDecoration: 'none' }}>
+                    <Link href={`/goi/${goiName}/new`} style={{ textDecoration: 'none' }}>
                         Add
                     </Link>
                 </ListItemButton>
