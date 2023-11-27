@@ -10,10 +10,10 @@ export default function GoiEntries({ params }: { params: { name: string } }) {
 
     return (
         <List>
-            {listEntries(goiName).map((goi, index) =>
+            {listEntries(goiName).map((goiEntry, index) =>
                 <ListItem key={index}>
                     <ListItemButton>
-                        <ListItemText primary={goi.word} />
+                        <ListItemText primary={goiEntry.word} />
                     </ListItemButton>
                 </ListItem>)}
             <ListItem>
