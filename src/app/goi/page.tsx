@@ -1,18 +1,27 @@
 import Link from 'next/link'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
 import { getAllGoi } from '@/app/lib/goi'
 
 export default function GoiList() {
 
     return (
-        <div>
-            <ol>
-                {getAllGoi().map((goi) => <li>{goi["text"]}</li>)}
-            </ol>
-            <Link href="/goi/new">
-                <button>
-                    Add
-                </button>
-            </Link>
-        </div>
+        <List>
+            {getAllGoi().map((goi) =>
+                <ListItem>
+                    <ListItemButton>
+                        <ListItemText primary={goi["text"]} />
+                    </ListItemButton>
+                </ListItem>)}
+            <ListItem>
+                <ListItemButton>
+                    <Link href="/goi/new" style={{ textDecoration: 'none' }}>
+                        Add
+                    </Link>
+                </ListItemButton>
+            </ListItem>
+        </List>
     )
 }
