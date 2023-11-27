@@ -8,7 +8,7 @@ export default function NewGoi() {
     'use server'
     const text = formData.getAll('text')[0].toString()
     addEntry('テスト', { word: text, sentence: '' })
-    redirect('/goi')
+    redirect(`/goi/${encodeURIComponent('テスト')}`)
   }
 
   return (

@@ -5,12 +5,13 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import { listEntries } from '@/app/lib/goi'
 
-export default function GoiList() {
+export default function GoiEntries({ params }: { params: { name: string } }) {
+    const goiName = decodeURIComponent(params.name)
 
     return (
         <List>
-            {listEntries('テスト').map((goi) =>
-                <ListItem>
+            {listEntries(goiName).map((goi, index) =>
+                <ListItem key={index}>
                     <ListItemButton>
                         <ListItemText primary={goi.word} />
                     </ListItemButton>
