@@ -1,26 +1,50 @@
-export interface Goi {
-    text: string
+export interface GoiEntry {
+    sentence: string;
+    word: string;
 }
 
-const data = {
-    goi:
-        [
+interface Goi {
+    name: string;
+    entries: Array<GoiEntry>
+}
+
+const gois: Array<Goi> = [
+    {
+        name: 'テスト',
+        entries: [
             {
-                text: 'データ',
+                sentence: 'これはデータです。',
+                word: 'データ',
             },
             {
-                text: 'ユーザーインターフェイス',
+                sentence: 'これはユーザーインターフェイスです。',
+                word: 'ユーザーインターフェイス',
             },
-            {
-                text: 'サーバ',
-            }
         ],
+    },
+    {
+        name: 'テスト2',
+        entries: [
+            {
+                word: 'サーバ',
+                sentence: 'これはサーバです。',
+            },
+        ]
+    }
+]
+
+export function listEntries(goiName: string): Array<GoiEntry> {
+    const goi = gois.find(goi => goi.name === goiName);
+    if (goi === undefined) {
+        throw `goi ${goiName} is not found`
+    }
+    return goi!.entries;
 }
 
-export function getAllGoi() {
-    return data.goi
-}
-
-export function createGoi(goi: Goi) {
-    data.goi.push(goi)
+export function addEntry(goiName: string, goiEntry: GoiEntry) {
+    const goi = gois.find(goi => goi.name === goiName);
+    if (goi === undefined) {
+        throw `goi ${goiName} is not found`
+    }
+    goi!.entries.push(goiEntry);
 }

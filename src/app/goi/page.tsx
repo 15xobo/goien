@@ -3,16 +3,16 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
-import { getAllGoi } from '@/app/lib/goi'
+import { listEntries } from '@/app/lib/goi'
 
 export default function GoiList() {
 
     return (
         <List>
-            {getAllGoi().map((goi) =>
+            {listEntries('テスト').map((goi) =>
                 <ListItem>
                     <ListItemButton>
-                        <ListItemText primary={goi["text"]} />
+                        <ListItemText primary={goi.word} />
                     </ListItemButton>
                 </ListItem>)}
             <ListItem>
