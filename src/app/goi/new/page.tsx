@@ -1,5 +1,7 @@
-import { createGoi } from "@/app/lib/goi"
 import { redirect } from "next/navigation"
+import Button from "@mui/material/Button"
+import TextField from "@mui/material/TextField"
+import { createGoi } from "@/app/lib/goi"
 
 export default function NewGoi() {
   async function addGoi(formData: FormData) {
@@ -12,10 +14,10 @@ export default function NewGoi() {
   return (
     <div>
       <form action={addGoi}>
-        <input type="text" name="text" autoFocus />
-        <button type="submit">
+        <TextField type="text" name="text" autoFocus fullWidth/>
+        <Button type="submit" fullWidth>
           Submit
-        </button>
+        </Button>
       </form>
     </div>
   )
