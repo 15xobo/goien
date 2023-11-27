@@ -1,29 +1,17 @@
 import Link from 'next/link'
+import { getAllGoi } from '@/app/lib/goi'
 
 export default function GoiList() {
-    const data =
-        [
-            {
-                "text": "データ",
-            },
-            {
-                "text": "ユーザーインターフェイス",
-            },
-            {
-                "text": " サーバ",
-            }
-        ]
-
 
     return (
         <div>
             <ol>
-                {data.map((goi) => <li>{goi["text"]}</li>)}
+                {getAllGoi().map((goi) => <li>{goi["text"]}</li>)}
             </ol>
             <Link href="/goi/new">
-            <button>
-                Add
-            </button>
+                <button>
+                    Add
+                </button>
             </Link>
         </div>
     )
