@@ -3,14 +3,15 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
-import { listEntries } from '@/app/lib/goi'
+import { goiClient } from '@/app/lib/goi'
 
-export default function GoiEntries({ params }: { params: { name: string } }) {
+export default async function GoiEntries({ params }: { params: { name: string } }) {
     const goiName = decodeURIComponent(params.name)
+    const goiEntries = await goiClient.listEntries(goiName)
 
     return (
         <List>
-            {listEntries(goiName).map((goiEntry, index) =>
+            {goiEntries.map((goiEntry, index) =>
                 <ListItem key={index}>
                     <ListItemButton>
                         <ListItemText primary={goiEntry.word} />

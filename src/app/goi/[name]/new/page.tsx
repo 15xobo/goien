@@ -2,16 +2,15 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
-import { addEntry } from "@/app/lib/goi"
+import { goiClient } from "@/app/lib/goi"
 
 export default function NewGoi({ params }: { params: { name: string } }) {
   async function addGoi(formData: FormData) {
     'use server'
     const goiName = decodeURIComponent(params.name)
     const text = formData.getAll('text')[0].toString()
-    addEntry(goiName, { word: text, sentence: '' })
+    await goiClient.addEntry(goiName, { word: text, sentence: '' })
     revalidatePath(`/goi/${params.name}`)
-    console.log(`/goi/${params.name}`)
     redirect(`/goi/${params.name}`)
   }
 
