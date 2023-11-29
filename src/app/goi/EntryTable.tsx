@@ -1,5 +1,6 @@
 'use client'
 
+import { addEntry, deleteEntries } from './actions'
 import { useRef, useState } from 'react'
 
 import AddIcon from '@mui/icons-material/Add';
@@ -16,7 +17,6 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField';
-import { deleteEntries } from './actions'
 import { useRouter } from 'next/navigation'
 
 function EntryRows({ goiEntries, onRowSelected }: { goiEntries: Array<GoiEntryData>, onRowSelected: (index: number, selected: boolean) => void }) {
@@ -88,10 +88,12 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
 
     return (
         <Paper >
-            <Button>
-                <Link href={`/goi/${goiName}/new`} style={{ textDecoration: 'none' }}>
-                    Add
-                </Link>
+            <Button disabled={newGoiEntry === undefined} onClick={() => {
+                addEntry(goiName, newGoiEntry!)
+                setNewGoiEntry(undefined)
+                router.refresh()
+            }}>
+                Add
             </Button>
             <Button onClick={() => {
                 deleteEntries(goiName, goiEntries.filter((entry, index) => selected[index]))
