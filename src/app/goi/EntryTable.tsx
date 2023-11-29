@@ -10,6 +10,8 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
+import { deleteEntries } from './actions'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 function EntryRows({ goiEntries, onRowSelected }: { goiEntries: Array<GoiEntryData>, onRowSelected: (index: number, selected: boolean) => void }) {
@@ -28,6 +30,7 @@ function EntryRows({ goiEntries, onRowSelected }: { goiEntries: Array<GoiEntryDa
 
 export default function EntryTable({ goiName, goiEntries }: { goiName: string, goiEntries: Array<GoiEntryData> }) {
     const [selected, setSelected] = useState<Array<boolean>>(Array(goiEntries.length).fill(false))
+    const router = useRouter()
 
     return (
         <Paper >
@@ -35,6 +38,12 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                 <Link href={`/goi/${goiName}/new`} style={{ textDecoration: 'none' }}>
                     Add
                 </Link>
+            </Button>
+            <Button onClick={() => {
+                deleteEntries(goiName, goiEntries.filter((entry, index) => selected[index]))
+                router.refresh()
+            }}>
+                Delete
             </Button>
             <TableContainer>
                 <Table>
@@ -44,7 +53,6 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                         <EntryRows goiEntries={goiEntries} onRowSelected={(rowIndex, rowSelected) => {
                             selected[rowIndex] = rowSelected
                             setSelected(Array.from(selected))
-                            console.log(goiEntries.filter((entry, index) => selected[index]))
                         }} />
                     </TableBody>
                 </Table>

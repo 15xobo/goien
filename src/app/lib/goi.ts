@@ -23,15 +23,20 @@ const goiClient = function () {
                 throw `goi ${goiName} is not found`
             }
             const goi_entry_docs = await goi_entires_collection.find({ goi_name: goiName }).toArray()
-            return goi_entry_docs.map(doc => { return { sentence: doc.sentence, word: doc.word } })
+            return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, word: doc.word } })
         },
+
         addEntry: async function (goiName: string, goiEntry: GoiEntry): Promise<void> {
             const goi_doc = await gois_collection.findOne({ name: goiName })
             if (!goi_doc) {
                 throw `goi ${goiName} is not found`
             }
             await goi_entires_collection.insertOne({ goi_name: goiName, ...goiEntry })
-        }
+        },
+
+        deleteEntry: async function (goiName: string, goiEntry: GoiEntry) {
+            goi_entires_collection.deleteOne({goi_name: goiName, word: goiEntry.word, sentence: goiEntry.sentence})
+        },
     }
 }()
 
