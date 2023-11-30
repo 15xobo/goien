@@ -1,7 +1,6 @@
 'use client'
 
-import { addEntry, deleteEntries } from './actions'
-import { useRef, useState } from 'react'
+import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
@@ -9,7 +8,6 @@ import Checkbox from '@mui/material/Checkbox'
 import ClearIcon from '@mui/icons-material/Clear';
 import { GoiEntry as GoiEntryData } from '@/app/lib/goi'
 import IconButton from '@mui/material/IconButton';
-import Link from 'next/link'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -18,13 +16,22 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-function EntryRows({ goiEntries, onRowSelected }: { goiEntries: Array<GoiEntryData>, onRowSelected: (index: number, selected: boolean) => void }) {
+function EntryRows({ goiEntries, selectedRow, onRowSelected }: { goiEntries: Array<GoiEntryData>, selectedRow: number, onRowSelected: (index: number) => void }) {
     return goiEntries.map((entry, index) => {
         return (
             <TableRow key={index} hover>
                 <TableCell padding="checkbox">
-                    <Checkbox onChange={(event) => onRowSelected(index, event.target.checked)} />
+                    <Checkbox
+                        checked={index === selectedRow}
+                        onChange={(event) => {
+                            if (event.target.checked) {
+                                onRowSelected(index)
+                            } else {
+                                onRowSelected(-1)
+                            }
+                        }} />
                 </TableCell>
                 <TableCell>{entry.word}</TableCell>
                 <TableCell>{entry.sentence}</TableCell>
@@ -82,7 +89,7 @@ function NewEntryRow(
 }
 
 export default function EntryTable({ goiName, goiEntries }: { goiName: string, goiEntries: Array<GoiEntryData> }) {
-    const [selected, setSelected] = useState<Array<boolean>>(Array(goiEntries.length).fill(false))
+    const [selectedEntryIndex, setSelectedEntryIndex] = useState<number>(-1)
     const [newGoiEntry, setNewGoiEntry] = useState<GoiEntryData>()
     const router = useRouter()
 
@@ -95,8 +102,9 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
             }}>
                 Add
             </Button>
-            <Button onClick={() => {
-                deleteEntries(goiName, goiEntries.filter((entry, index) => selected[index]))
+            <Button disabled={selectedEntryIndex === -1} onClick={() => {
+                deleteEntry(goiName, goiEntries[selectedEntryIndex])
+                setSelectedEntryIndex(-1)
                 router.refresh()
             }}>
                 Delete
@@ -106,10 +114,11 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                     <TableBody
                         sx={{ cursor: 'pointer' }}
                     >
-                        <EntryRows goiEntries={goiEntries} onRowSelected={(rowIndex, rowSelected) => {
-                            selected[rowIndex] = rowSelected
-                            setSelected(Array.from(selected))
-                        }} />
+                        <EntryRows
+                            goiEntries={goiEntries}
+                            selectedRow={selectedEntryIndex}
+                            onRowSelected={setSelectedEntryIndex}
+                        />
                         <NewEntryRow goiEntry={newGoiEntry} setEntry={setNewGoiEntry}></NewEntryRow>
                     </TableBody>
                 </Table>
