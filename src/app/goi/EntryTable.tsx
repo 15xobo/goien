@@ -3,9 +3,7 @@
 import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
-import Button from '@mui/material/Button'
 import CheckIcon from '@mui/icons-material/Check';
-import Checkbox from '@mui/material/Checkbox'
 import ClearIcon from '@mui/icons-material/Clear';
 import { GoiEntry as GoiEntryData } from '@/app/lib/goi'
 import IconButton from '@mui/material/IconButton';
@@ -20,27 +18,37 @@ import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRows({ goiEntries, selectedRow, onRowSelected }: { goiEntries: Array<GoiEntryData>, selectedRow: number, onRowSelected: (index: number) => void }) {
+function EntryRows(
+    { goiEntries, selectedRow, onRowSelected, onConfirm }: {
+        goiEntries: Array<GoiEntryData>,
+        selectedRow: number,
+        onRowSelected: (index: number) => void,
+        onConfirm: (entry: GoiEntryData) => void,
+    }
+) {
     return goiEntries.map((entry, index) => {
         return (
             <TableRow key={index} hover>
                 <TableCell padding="checkbox" sx={selectedRow === index ? {} : { visibility: 'hidden' }}>
-                    <IconButton color='success' >
+                    <IconButton
+                        color='success'
+                        onClick={() => onConfirm(entry)}
+                    >
                         <CheckIcon />
                     </IconButton>
                 </TableCell>
                 <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
                     {selectedRow === index ? (
                         <IconButton
-                            color='error' 
+                            color='error'
                             onClick={() => onRowSelected(-1)}
                         >
                             <ClearIcon />
                         </IconButton>
                     ) : (
-                        <IconButton 
+                        <IconButton
                             disabled={selectedRow !== -1}
-                            color='info' 
+                            color='info'
                             onClick={() => onRowSelected(index)}
                         >
                             <RemoveIcon />
@@ -55,9 +63,10 @@ function EntryRows({ goiEntries, selectedRow, onRowSelected }: { goiEntries: Arr
 }
 
 function NewEntryRow(
-    { goiEntry, setEntry }: {
+    { goiEntry, setEntry, onConfirm }: {
         goiEntry: GoiEntryData | undefined,
-        setEntry: (entry: GoiEntryData | undefined) => void
+        setEntry: (entry: GoiEntryData | undefined) => void,
+        onConfirm: (entry: GoiEntryData) => void,
     }
 ) {
     const editingActive = goiEntry !== undefined
@@ -65,21 +74,24 @@ function NewEntryRow(
     return (
         <TableRow hover>
             <TableCell padding="checkbox" sx={editingActive ? {} : { visibility: 'hidden' }}>
-                <IconButton color='success' >
+                <IconButton
+                    color='success'
+                    onClick={() => onConfirm(goiEntry!)}
+                >
                     <CheckIcon />
                 </IconButton>
             </TableCell>
             <TableCell padding="checkbox">
                 {editingActive ? (
                     <IconButton
-                        color='error' 
+                        color='error'
                         onClick={() => setEntry(undefined)}
                     >
                         <ClearIcon />
                     </IconButton>
                 ) : (
                     <IconButton
-                        color='info' 
+                        color='info'
                         onClick={() => setEntry({ word: '', sentence: '' })}
                     >
                         <AddIcon />
@@ -117,20 +129,6 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
 
     return (
         <Paper >
-            <Button disabled={newGoiEntry === undefined} onClick={() => {
-                addEntry(goiName, newGoiEntry!)
-                setNewGoiEntry(undefined)
-                router.refresh()
-            }}>
-                Add
-            </Button>
-            <Button disabled={selectedEntryIndex === -1} onClick={() => {
-                deleteEntry(goiName, goiEntries[selectedEntryIndex])
-                setSelectedEntryIndex(-1)
-                router.refresh()
-            }}>
-                Delete
-            </Button>
             <TableContainer>
                 <Table>
                     <TableBody
@@ -140,8 +138,21 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                             goiEntries={goiEntries}
                             selectedRow={selectedEntryIndex}
                             onRowSelected={setSelectedEntryIndex}
+                            onConfirm={(goiEntry) => {
+                                deleteEntry(goiName, goiEntry)
+                                setSelectedEntryIndex(-1)
+                                router.refresh()
+                            }}
                         />
-                        <NewEntryRow goiEntry={newGoiEntry} setEntry={setNewGoiEntry}></NewEntryRow>
+                        <NewEntryRow
+                            goiEntry={newGoiEntry}
+                            setEntry={setNewGoiEntry}
+                            onConfirm={(goiEntry) => {
+                                addEntry(goiName, goiEntry)
+                                setNewGoiEntry(undefined)
+                                router.refresh()
+                            }}
+                        />
                     </TableBody>
                 </Table>
             </TableContainer>
