@@ -19,18 +19,21 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 function EntryRows(
-    { goiName, goiEntries }: {
+    { goiName, goiEntries, editDisabled, onEditActivated, onEditDeactivated }: {
         goiName: string,
         goiEntries: Array<GoiEntryData>,
+        editDisabled: boolean,
+        onEditActivated: () => void,
+        onEditDeactivated: () => void,
     }
 ) {
     const unselectedIndex = -1
     const [selectedIndex, setSelectedIndex] = useState<number>(unselectedIndex)
-    const selected = selectedIndex !== unselectedIndex
     const router = useRouter()
 
-    function resetSelectedIndex() {
+    function reset() {
         setSelectedIndex(unselectedIndex)
+        onEditDeactivated()
     }
 
     return goiEntries.map((entry, index) => {
@@ -41,7 +44,7 @@ function EntryRows(
                         color='success'
                         onClick={() => {
                                 deleteEntry(goiName, entry)
-                                resetSelectedIndex()
+                                reset()
                                 router.refresh()
                         }}
                     >
@@ -52,15 +55,18 @@ function EntryRows(
                     {selectedIndex === index ? (
                         <IconButton
                             color='error'
-                            onClick={resetSelectedIndex}
+                            onClick={reset}
                         >
                             <ClearIcon />
                         </IconButton>
                     ) : (
                         <IconButton
-                            disabled={selected}
+                            disabled={editDisabled || (selectedIndex != unselectedIndex)}
                             color='info'
-                            onClick={() => setSelectedIndex(index)}
+                            onClick={() => {
+                                onEditActivated()
+                                setSelectedIndex(index)
+                            }}
                         >
                             <RemoveIcon />
                         </IconButton>
@@ -74,8 +80,11 @@ function EntryRows(
 }
 
 function NewEntryRow(
-    { goiName }: {
+    { goiName, editDisabled, onEditActivated, onEditDeactivated }: {
         goiName: string,
+        editDisabled: boolean,
+        onEditActivated: () => void,
+        onEditDeactivated: () => void,
     }
 ) {
     const emptyEntry = {word: '', sentence: ''}
@@ -86,6 +95,7 @@ function NewEntryRow(
     function reset() {
         setEntry(emptyEntry)
         setEditing(false)
+        onEditDeactivated()
     }
 
     return (
@@ -113,8 +123,12 @@ function NewEntryRow(
                     </IconButton>
                 ) : (
                     <IconButton
+                        disabled={editDisabled}
                         color='info'
-                        onClick={() => setEditing(true)}
+                        onClick={() => {
+                            onEditActivated()
+                            setEditing(true)
+                        }}
                     >
                         <AddIcon />
                     </IconButton>
@@ -145,6 +159,11 @@ function NewEntryRow(
 }
 
 export default function EntryTable({ goiName, goiEntries }: { goiName: string, goiEntries: Array<GoiEntryData> }) {
+    const noneEdit = 'none'
+    const entriesEdit = 'entries'
+    const newEntryEdit = 'new'
+    const [activeEdit, setActiveEdit] = useState(noneEdit)
+
     return (
         <Paper >
             <TableContainer>
@@ -155,9 +174,15 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                         <EntryRows
                             goiName={goiName}
                             goiEntries={goiEntries}
+                            editDisabled={!(activeEdit === noneEdit || activeEdit === entriesEdit)}
+                            onEditActivated={() => setActiveEdit(entriesEdit)}
+                            onEditDeactivated={() => setActiveEdit(noneEdit)}
                         />
                         <NewEntryRow
                             goiName={goiName}
+                            editDisabled={!(activeEdit === noneEdit || activeEdit === newEntryEdit)}
+                            onEditActivated={() => setActiveEdit(newEntryEdit)}
+                            onEditDeactivated={() => setActiveEdit(noneEdit)}
                         />
                     </TableBody>
                 </Table>
