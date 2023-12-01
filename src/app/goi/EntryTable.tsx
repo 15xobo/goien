@@ -19,37 +19,48 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 function EntryRows(
-    { goiEntries, selectedRow, onRowSelected, onConfirm }: {
+    { goiName, goiEntries }: {
+        goiName: string,
         goiEntries: Array<GoiEntryData>,
-        selectedRow: number,
-        onRowSelected: (index: number) => void,
-        onConfirm: (entry: GoiEntryData) => void,
     }
 ) {
+    const unselectedIndex = -1
+    const [selectedIndex, setSelectedIndex] = useState<number>(unselectedIndex)
+    const selected = selectedIndex !== unselectedIndex
+    const router = useRouter()
+
+    function resetSelectedIndex() {
+        setSelectedIndex(unselectedIndex)
+    }
+
     return goiEntries.map((entry, index) => {
         return (
             <TableRow key={index} hover>
-                <TableCell padding="checkbox" sx={selectedRow === index ? {} : { visibility: 'hidden' }}>
+                <TableCell padding="checkbox" sx={selectedIndex === index ? {} : { visibility: 'hidden' }}>
                     <IconButton
                         color='success'
-                        onClick={() => onConfirm(entry)}
+                        onClick={() => {
+                                deleteEntry(goiName, entry)
+                                resetSelectedIndex()
+                                router.refresh()
+                        }}
                     >
                         <CheckIcon />
                     </IconButton>
                 </TableCell>
                 <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
-                    {selectedRow === index ? (
+                    {selectedIndex === index ? (
                         <IconButton
                             color='error'
-                            onClick={() => onRowSelected(-1)}
+                            onClick={resetSelectedIndex}
                         >
                             <ClearIcon />
                         </IconButton>
                     ) : (
                         <IconButton
-                            disabled={selectedRow !== -1}
+                            disabled={selected}
                             color='info'
-                            onClick={() => onRowSelected(index)}
+                            onClick={() => setSelectedIndex(index)}
                         >
                             <RemoveIcon />
                         </IconButton>
@@ -63,59 +74,70 @@ function EntryRows(
 }
 
 function NewEntryRow(
-    { goiEntry, setEntry, onConfirm }: {
-        goiEntry: GoiEntryData | undefined,
-        setEntry: (entry: GoiEntryData | undefined) => void,
-        onConfirm: (entry: GoiEntryData) => void,
+    { goiName }: {
+        goiName: string,
     }
 ) {
-    const editingActive = goiEntry !== undefined
+    const emptyEntry = {word: '', sentence: ''}
+    const [entry, setEntry] = useState<GoiEntryData>(emptyEntry)
+    const [editing, setEditing] = useState(false)
+    const router = useRouter()
+
+    function reset() {
+        setEntry(emptyEntry)
+        setEditing(false)
+    }
 
     return (
         <TableRow hover>
-            <TableCell padding="checkbox" sx={editingActive ? {} : { visibility: 'hidden' }}>
+            <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
                 <IconButton
                     color='success'
-                    onClick={() => onConfirm(goiEntry!)}
+                    onClick={() => {
+                        addEntry(goiName, entry)
+                        reset()
+                        setEditing(false)
+                        router.refresh()
+                    }}
                 >
                     <CheckIcon />
                 </IconButton>
             </TableCell>
             <TableCell padding="checkbox">
-                {editingActive ? (
+                {editing ? (
                     <IconButton
                         color='error'
-                        onClick={() => setEntry(undefined)}
+                        onClick={reset}
                     >
                         <ClearIcon />
                     </IconButton>
                 ) : (
                     <IconButton
                         color='info'
-                        onClick={() => setEntry({ word: '', sentence: '' })}
+                        onClick={() => setEditing(true)}
                     >
                         <AddIcon />
                     </IconButton>
                 )}
             </TableCell>
-            <TableCell sx={editingActive ? {} : { visibility: 'hidden' }}>
+            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
                 <TextField
                     variant='standard'
                     size='small'
                     fullWidth
                     multiline
-                    value={goiEntry?.word}
-                    onChange={(event) => setEntry({ word: event.target.value, sentence: goiEntry!.sentence })}
+                    value={entry.word}
+                    onChange={(event) => setEntry({ word: event.target.value, sentence: entry!.sentence })}
                 />
             </TableCell>
-            <TableCell sx={editingActive ? {} : { visibility: 'hidden' }}>
+            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
                 <TextField
                     variant='standard'
                     size="small"
                     fullWidth
                     multiline
-                    value={goiEntry?.sentence}
-                    onChange={(event) => setEntry({ word: goiEntry!.word, sentence: event.target.value })}
+                    value={entry.sentence}
+                    onChange={(event) => setEntry({ word: entry!.word, sentence: event.target.value })}
                 />
             </TableCell>
         </TableRow>
@@ -123,10 +145,6 @@ function NewEntryRow(
 }
 
 export default function EntryTable({ goiName, goiEntries }: { goiName: string, goiEntries: Array<GoiEntryData> }) {
-    const [selectedEntryIndex, setSelectedEntryIndex] = useState<number>(-1)
-    const [newGoiEntry, setNewGoiEntry] = useState<GoiEntryData>()
-    const router = useRouter()
-
     return (
         <Paper >
             <TableContainer>
@@ -135,23 +153,11 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                         sx={{ cursor: 'pointer' }}
                     >
                         <EntryRows
+                            goiName={goiName}
                             goiEntries={goiEntries}
-                            selectedRow={selectedEntryIndex}
-                            onRowSelected={setSelectedEntryIndex}
-                            onConfirm={(goiEntry) => {
-                                deleteEntry(goiName, goiEntry)
-                                setSelectedEntryIndex(-1)
-                                router.refresh()
-                            }}
                         />
                         <NewEntryRow
-                            goiEntry={newGoiEntry}
-                            setEntry={setNewGoiEntry}
-                            onConfirm={(goiEntry) => {
-                                addEntry(goiName, goiEntry)
-                                setNewGoiEntry(undefined)
-                                router.refresh()
-                            }}
+                            goiName={goiName}
                         />
                     </TableBody>
                 </Table>
