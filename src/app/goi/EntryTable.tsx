@@ -43,7 +43,7 @@ function EntryRows(
                     <IconButton
                         color='success'
                         onClick={() => {
-                                deleteEntry(goiName, entry)
+                                deleteEntry(goiName, entry.id!)
                                 reset()
                                 router.refresh()
                         }}

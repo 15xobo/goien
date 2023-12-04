@@ -1,6 +1,7 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 export interface GoiEntry {
+    id?: string;
     sentence: string;
     word: string;
 }
@@ -34,8 +35,8 @@ const goiClient = function () {
             await goi_entires_collection.insertOne({ goi_name: goiName, ...goiEntry })
         },
 
-        deleteEntry: async function (goiName: string, goiEntry: GoiEntry) {
-            goi_entires_collection.deleteOne({goi_name: goiName, word: goiEntry.word, sentence: goiEntry.sentence})
+        deleteEntry: async function (goiName: string, goiId: string) {
+            goi_entires_collection.deleteOne({goi_name: goiName, _id: new ObjectId(goiId)})
         },
     }
 }()
