@@ -31,52 +31,110 @@ function EntryRows(
     const [selectedIndex, setSelectedIndex] = useState<number>(unselectedIndex)
     const router = useRouter()
 
-    function reset() {
-        setSelectedIndex(unselectedIndex)
-        onEditDeactivated()
-    }
-
     return goiEntries.map((entry, index) => {
         return (
-            <TableRow key={index} hover>
-                <TableCell padding="checkbox" sx={selectedIndex === index ? {} : { visibility: 'hidden' }}>
-                    <IconButton
-                        color='success'
-                        onClick={() => {
-                                deleteEntry(goiName, entry.id!)
-                                reset()
-                                router.refresh()
-                        }}
-                    >
-                        <CheckIcon />
-                    </IconButton>
-                </TableCell>
-                <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
-                    {selectedIndex === index ? (
-                        <IconButton
-                            color='error'
-                            onClick={reset}
-                        >
-                            <ClearIcon />
-                        </IconButton>
-                    ) : (
-                        <IconButton
-                            disabled={editDisabled || (selectedIndex != unselectedIndex)}
-                            color='info'
-                            onClick={() => {
-                                onEditActivated()
-                                setSelectedIndex(index)
-                            }}
-                        >
-                            <RemoveIcon />
-                        </IconButton>
-                    )}
-                </TableCell>
-                <TableCell>{entry.word}</TableCell>
-                <TableCell>{entry.sentence}</TableCell>
-            </TableRow>
-        );
+            <EntryRow
+                key={index}
+                goiEntry={entry}
+                editing={selectedIndex === index}
+                editDisabled={editDisabled || selectedIndex !== unselectedIndex}
+                onSelect={() => {
+                    setSelectedIndex(index)
+                    onEditActivated()
+                }}
+                onConfirm={() => {
+                    deleteEntry(goiName, entry.id!)
+                    setSelectedIndex(unselectedIndex)
+                    onEditDeactivated()
+                    router.refresh()
+                }}
+                onCancel={() => {
+                    setSelectedIndex(unselectedIndex)
+                    onEditDeactivated()
+                }}
+            />
+            //     <TableRow key={index} hover>
+            //         <TableCell padding="checkbox" sx={selectedIndex === index ? {} : { visibility: 'hidden' }}>
+            //             <IconButton
+            //                 color='success'
+            //                 onClick={() => {
+            //                         deleteEntry(goiName, entry.id!)
+            //                         reset()
+            //                         router.refresh()
+            //                 }}
+            //             >
+            //                 <CheckIcon />
+            //             </IconButton>
+            //         </TableCell>
+            //         <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
+            //             {selectedIndex === index ? (
+            //                 <IconButton
+            //                     color='error'
+            //                     onClick={reset}
+            //                 >
+            //                     <ClearIcon />
+            //                 </IconButton>
+            //             ) : (
+            //                 <IconButton
+            //                     disabled={editDisabled || (selectedIndex != unselectedIndex)}
+            //                     color='info'
+            //                     onClick={() => {
+            //                         onEditActivated()
+            //                         setSelectedIndex(index)
+            //                     }}
+            //                 >
+            //                     <RemoveIcon />
+            //                 </IconButton>
+            //             )}
+            //         </TableCell>
+            //         <TableCell>{entry.word}</TableCell>
+            //         <TableCell>{entry.sentence}</TableCell>
+            //     </TableRow>
+        )
     })
+}
+
+function EntryRow({
+    goiEntry, editing, editDisabled, onSelect, onConfirm, onCancel }: {
+        goiEntry: GoiEntryData,
+        editing: boolean,
+        editDisabled: boolean,
+        onSelect: () => void,
+        onConfirm: () => void,
+        onCancel: () => void,
+    }) {
+    return (
+        <TableRow hover>
+            <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
+                <IconButton
+                    color='success'
+                    onClick={onConfirm}
+                >
+                    <CheckIcon />
+                </IconButton>
+            </TableCell>
+            <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
+                {editing ? (
+                    <IconButton
+                        color='error'
+                        onClick={onCancel}
+                    >
+                        <ClearIcon />
+                    </IconButton>
+                ) : (
+                    <IconButton
+                        disabled={editDisabled}
+                        color='info'
+                        onClick={onSelect}
+                    >
+                        <RemoveIcon />
+                    </IconButton>
+                )}
+            </TableCell>
+            <TableCell>{goiEntry.word}</TableCell>
+            <TableCell>{goiEntry.sentence}</TableCell>
+        </TableRow>
+    )
 }
 
 function NewEntryRow(
@@ -87,7 +145,7 @@ function NewEntryRow(
         onEditDeactivated: () => void,
     }
 ) {
-    const emptyEntry = {word: '', sentence: ''}
+    const emptyEntry = { word: '', sentence: '' }
     const [entry, setEntry] = useState<GoiEntryData>(emptyEntry)
     const [editing, setEditing] = useState(false)
     const router = useRouter()
