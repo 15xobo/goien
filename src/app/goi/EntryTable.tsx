@@ -15,8 +15,14 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+interface EntryMutation {
+    type: string,
+    entry?: GoiEntryData,
+}
 
 function EntryRows(
     { goiName, goiEntries, editDisabled, onEditActivated, onEditDeactivated }: {
@@ -29,6 +35,7 @@ function EntryRows(
 ) {
     const unselectedIndex = -1
     const [selectedIndex, setSelectedIndex] = useState<number>(unselectedIndex)
+    const [mutation, setMutation] = useState<EntryMutation | null>(null)
     const router = useRouter()
 
     return goiEntries.map((entry, index) => {
@@ -36,11 +43,14 @@ function EntryRows(
             <EntryRow
                 key={index}
                 goiEntry={entry}
-                editing={selectedIndex === index}
+                deleting={selectedIndex === index && mutation?.type === 'delete'}
                 editDisabled={editDisabled || selectedIndex !== unselectedIndex}
                 onSelect={() => {
                     setSelectedIndex(index)
                     onEditActivated()
+                }}
+                onDelete={() => {
+                    setMutation({ type: 'delete' })
                 }}
                 onConfirm={() => {
                     deleteEntry(goiName, entry.id!)
@@ -50,59 +60,30 @@ function EntryRows(
                 }}
                 onCancel={() => {
                     setSelectedIndex(unselectedIndex)
+                    setMutation(null)
                     onEditDeactivated()
                 }}
             />
-            //     <TableRow key={index} hover>
-            //         <TableCell padding="checkbox" sx={selectedIndex === index ? {} : { visibility: 'hidden' }}>
-            //             <IconButton
-            //                 color='success'
-            //                 onClick={() => {
-            //                         deleteEntry(goiName, entry.id!)
-            //                         reset()
-            //                         router.refresh()
-            //                 }}
-            //             >
-            //                 <CheckIcon />
-            //             </IconButton>
-            //         </TableCell>
-            //         <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
-            //             {selectedIndex === index ? (
-            //                 <IconButton
-            //                     color='error'
-            //                     onClick={reset}
-            //                 >
-            //                     <ClearIcon />
-            //                 </IconButton>
-            //             ) : (
-            //                 <IconButton
-            //                     disabled={editDisabled || (selectedIndex != unselectedIndex)}
-            //                     color='info'
-            //                     onClick={() => {
-            //                         onEditActivated()
-            //                         setSelectedIndex(index)
-            //                     }}
-            //                 >
-            //                     <RemoveIcon />
-            //                 </IconButton>
-            //             )}
-            //         </TableCell>
-            //         <TableCell>{entry.word}</TableCell>
-            //         <TableCell>{entry.sentence}</TableCell>
-            //     </TableRow>
         )
     })
 }
 
 function EntryRow({
-    goiEntry, editing, editDisabled, onSelect, onConfirm, onCancel }: {
+    goiEntry, deleting, editDisabled, onSelect, onDelete, onConfirm, onCancel }: {
         goiEntry: GoiEntryData,
-        editing: boolean,
+        deleting: boolean,
         editDisabled: boolean,
         onSelect: () => void,
+        onDelete: () => void,
         onConfirm: () => void,
         onCancel: () => void,
     }) {
+    const editing = deleting
+    const textStyle = deleting ? {
+        textDecoration: 'line-through',
+        textDecorationThickness: '0.1em',
+    } : {}
+    const textColor = deleting ? 'error' : 'black'
     return (
         <TableRow hover>
             <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
@@ -125,14 +106,25 @@ function EntryRow({
                     <IconButton
                         disabled={editDisabled}
                         color='info'
-                        onClick={onSelect}
+                        onClick={() => {
+                            onSelect()
+                            onDelete()
+                        }}
                     >
                         <RemoveIcon />
                     </IconButton>
                 )}
             </TableCell>
-            <TableCell>{goiEntry.word}</TableCell>
-            <TableCell>{goiEntry.sentence}</TableCell>
+            <TableCell >
+                <Typography color={textColor} sx={textStyle}>
+                    {goiEntry.word}
+                </Typography>
+            </TableCell>
+            <TableCell >
+                <Typography color={textColor} sx={textStyle}>
+                    {goiEntry.sentence}
+                </Typography>
+            </TableCell>
         </TableRow>
     )
 }
