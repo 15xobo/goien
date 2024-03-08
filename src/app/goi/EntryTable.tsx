@@ -117,12 +117,12 @@ function EntryRow({
             </TableCell>
             <TableCell >
                 <Typography color={textColor} sx={textStyle}>
-                    {goiEntry.word}
+                    {goiEntry.sentence}
                 </Typography>
             </TableCell>
             <TableCell >
                 <Typography color={textColor} sx={textStyle}>
-                    {goiEntry.sentence}
+                    {goiEntry.sentence.substring(goiEntry.wordStart, goiEntry.wordEnd)}
                 </Typography>
             </TableCell>
         </TableRow>
@@ -137,7 +137,7 @@ function NewEntryRow(
         onEditDeactivated: () => void,
     }
 ) {
-    const emptyEntry = { word: '', sentence: '' }
+    const emptyEntry = { sentence: '', wordStart: 0, wordEnd: 0 }
     const [entry, setEntry] = useState<GoiEntryData>(emptyEntry)
     const [editing, setEditing] = useState(false)
     const router = useRouter()
@@ -150,7 +150,7 @@ function NewEntryRow(
 
     function handleWordSelection(e: React.SyntheticEvent) {
         const target = e.target as HTMLTextAreaElement
-        setEntry({ word: entry!.sentence.substring(target.selectionStart, target.selectionEnd), sentence: entry!.sentence})
+        setEntry({ ...entry, wordStart: target.selectionStart, wordEnd: target.selectionEnd })
     }
 
     return (
@@ -189,16 +189,6 @@ function NewEntryRow(
                     </IconButton>
                 )}
             </TableCell>
-            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
-                <TextField
-                    variant='standard'
-                    size='small'
-                    fullWidth
-                    multiline
-                    value={entry.word}
-                    onChange={(event) => setEntry({ word: event.target.value, sentence: entry!.sentence })}
-                />
-            </TableCell>
             <TableCell sx={editing ? {} : { visibility: 'hidden' }} onMouseUp={handleWordSelection}>
                 <TextField
                     variant='standard'
@@ -206,7 +196,17 @@ function NewEntryRow(
                     fullWidth
                     multiline
                     value={entry.sentence}
-                    onChange={(event) => setEntry({ word: entry!.word, sentence: event.target.value })}
+                    onChange={(event) => setEntry({ ...entry, sentence: event.target.value })}
+                />
+            </TableCell>
+            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
+                <TextField
+                    variant='standard'
+                    size='small'
+                    fullWidth
+                    multiline
+                    disabled={true}
+                    value={entry.sentence.substring(entry.wordStart, entry.wordEnd)}
                 />
             </TableCell>
         </TableRow>

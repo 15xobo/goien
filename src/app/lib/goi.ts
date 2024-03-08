@@ -3,7 +3,8 @@ import { MongoClient, ObjectId } from "mongodb";
 export interface GoiEntry {
     id?: string;
     sentence: string;
-    word: string;
+    wordStart: number;
+    wordEnd: number;
 }
 
 interface Goi {
@@ -24,7 +25,7 @@ const goiClient = function () {
                 throw `goi ${goiName} is not found`
             }
             const goi_entry_docs = await goi_entires_collection.find({ goi_name: goiName }).toArray()
-            return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, word: doc.word } })
+            return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, wordStart: doc.wordStart, wordEnd: doc.wordEnd } })
         },
 
         addEntry: async function (goiName: string, goiEntry: GoiEntry): Promise<void> {
