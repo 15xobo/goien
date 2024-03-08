@@ -148,6 +148,11 @@ function NewEntryRow(
         onEditDeactivated()
     }
 
+    function handleWordSelection(e: React.SyntheticEvent) {
+        const target = e.target as HTMLTextAreaElement
+        setEntry({ word: entry!.sentence.substring(target.selectionStart, target.selectionEnd), sentence: entry!.sentence})
+    }
+
     return (
         <TableRow hover>
             <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
@@ -194,7 +199,7 @@ function NewEntryRow(
                     onChange={(event) => setEntry({ word: event.target.value, sentence: entry!.sentence })}
                 />
             </TableCell>
-            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
+            <TableCell sx={editing ? {} : { visibility: 'hidden' }} onMouseUp={handleWordSelection}>
                 <TextField
                     variant='standard'
                     size="small"
