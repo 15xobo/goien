@@ -132,11 +132,6 @@ function EntryRow({
                     {lastPart}
                 </Typography>
             </TableCell>
-            <TableCell >
-                <Typography color={textColor} sx={textStyle}>
-                    {goiEntry.sentence.substring(goiEntry.wordStart, goiEntry.wordEnd)}
-                </Typography>
-            </TableCell>
         </TableRow>
     )
 }
@@ -209,16 +204,6 @@ function NewEntryRow(
                     multiline
                     value={entry.sentence}
                     onChange={(event) => setEntry({ ...entry, sentence: event.target.value })}
-                />
-            </TableCell>
-            <TableCell sx={editing ? {} : { visibility: 'hidden' }}>
-                <TextField
-                    variant='standard'
-                    size='small'
-                    fullWidth
-                    multiline
-                    disabled={true}
-                    value={entry.sentence.substring(entry.wordStart, entry.wordEnd)}
                 />
             </TableCell>
         </TableRow>
