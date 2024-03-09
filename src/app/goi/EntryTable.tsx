@@ -84,6 +84,12 @@ function EntryRow({
         textDecorationThickness: '0.1em',
     } : {}
     const textColor = deleting ? 'error' : 'black'
+
+    const {sentence, wordStart, wordEnd} = goiEntry
+    const firstPart = sentence.substring(0, wordStart)
+    const wordPart = sentence.substring(wordStart, wordEnd)
+    const lastPart = sentence.substring(wordEnd)
+
     return (
         <TableRow hover>
             <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
@@ -116,8 +122,14 @@ function EntryRow({
                 )}
             </TableCell>
             <TableCell >
-                <Typography color={textColor} sx={textStyle}>
-                    {goiEntry.sentence}
+                <Typography display="inline" color={textColor} sx={textStyle}>
+                    {firstPart}
+                </Typography>
+                <Typography display="inline" color='error' sx={{...textStyle, textDecoration: 'underline'}}>
+                    {wordPart}
+                </Typography>
+                <Typography display="inline" color={textColor} sx={textStyle}>
+                    {lastPart}
                 </Typography>
             </TableCell>
             <TableCell >
