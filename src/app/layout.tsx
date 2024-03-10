@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import Container from '@mui/material/Container'
 import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
 import Button from '@mui/material/Button'
+import Container from '@mui/material/Container'
+import { Inter } from 'next/font/google'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+import Toolbar from '@mui/material/Toolbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AppBar position="sticky">
+        <AppBar position="fixed">
           <Container maxWidth="md">
             <Toolbar>
               <Button><Link href="/goi/テスト">Wordbook</Link></Button>
@@ -29,7 +29,7 @@ export default function RootLayout({
             </Toolbar>
           </Container>
         </AppBar>
-        <Container maxWidth='md' sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Container maxWidth='md' sx={{ marginTop: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {children}
         </Container>
       </body>
