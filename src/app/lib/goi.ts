@@ -9,7 +9,6 @@ export interface GoiEntry {
 
 interface Goi {
     name: string;
-    entries: Array<GoiEntry>
 }
 
 const goiClient = function () {
@@ -19,6 +18,11 @@ const goiClient = function () {
     const goi_entires_collection = database.collection("goi_entries")
 
     return {
+        listGois: async function (): Promise<Array<Goi>> {
+            const goi_docs = await gois_collection.find({}).toArray()
+            return goi_docs.map(doc => ({name: doc.name }))
+        },
+
         listEntries: async function (goiName: string): Promise<Array<GoiEntry>> {
             const goi_doc = await gois_collection.findOne({ name: goiName })
             if (!goi_doc) {
@@ -37,7 +41,7 @@ const goiClient = function () {
         },
 
         deleteEntry: async function (goiName: string, goiId: string) {
-            goi_entires_collection.deleteOne({goi_name: goiName, _id: new ObjectId(goiId)})
+            goi_entires_collection.deleteOne({ goi_name: goiName, _id: new ObjectId(goiId) })
         },
     }
 }()
