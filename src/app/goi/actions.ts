@@ -1,6 +1,10 @@
 'use server'
 
-import { GoiEntry, goiClient } from "../lib/goi";
+import { Goi, GoiEntry, goiClient } from "../lib/goi";
+
+export async function addGoi(goi: Goi) {
+    return goiClient.addGoi(goi)
+}
 
 export async function addEntry(goiName: string, goiEntry: GoiEntry) {
     return goiClient.addEntry(goiName, goiEntry)

@@ -7,7 +7,7 @@ export interface GoiEntry {
     wordEnd: number;
 }
 
-interface Goi {
+export interface Goi {
     name: string;
 }
 
@@ -20,7 +20,11 @@ const goiClient = function () {
     return {
         listGois: async function (): Promise<Array<Goi>> {
             const goi_docs = await gois_collection.find({}).toArray()
-            return goi_docs.map(doc => ({name: doc.name }))
+            return goi_docs.map(doc => ({ name: doc.name }))
+        },
+
+        addGoi: async function (goi: Goi): Promise<void> {
+            await gois_collection.updateOne({ name: goi.name }, { $set: { name: goi.name } }, { upsert: true })
         },
 
         listEntries: async function (goiName: string): Promise<Array<GoiEntry>> {
