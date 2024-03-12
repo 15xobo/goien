@@ -27,6 +27,10 @@ const goiClient = function () {
             await gois_collection.updateOne({ name: goi.name }, { $set: { name: goi.name } }, { upsert: true })
         },
 
+        deleteGoi: async function (name: string): Promise<void> {
+            await gois_collection.deleteOne({ name: name })
+        },
+
         listEntries: async function (goiName: string): Promise<Array<GoiEntry>> {
             const goi_doc = await gois_collection.findOne({ name: goiName })
             if (!goi_doc) {
