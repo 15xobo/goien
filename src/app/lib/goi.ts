@@ -26,10 +26,10 @@ const goiClient = function () {
             return goi_docs.map(doc => ({ id: doc.id, name: doc.name }))
         },
 
-        getGoi: async function (name: string): Promise<Goi> {
-            const goi_doc = await gois_collection.findOne({ name: name })
+        getGoi: async function (id: string): Promise<Goi> {
+            const goi_doc = await gois_collection.findOne({ id: id })
             if (!goi_doc) {
-                throw `goi ${name} is not found`
+                throw `goi ${id} is not found`
             }
             return { id: goi_doc.id, name: goi_doc.name }
         },
@@ -42,25 +42,21 @@ const goiClient = function () {
             await gois_collection.deleteOne({ id: id })
         },
 
-        listEntries: async function (goiName: string): Promise<Array<GoiEntry>> {
-            const goi_doc = await gois_collection.findOne({ name: goiName })
-            if (!goi_doc) {
-                throw `goi ${goiName} is not found`
-            }
-            const goi_entry_docs = await goi_entires_collection.find({ goi_name: goiName }).toArray()
+        listEntries: async function (goiId: string): Promise<Array<GoiEntry>> {
+            const goi_entry_docs = await goi_entires_collection.find({ goi_id: goiId }).toArray()
             return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, wordStart: doc.wordStart, wordEnd: doc.wordEnd } })
         },
 
-        addEntry: async function (goiName: string, goiEntry: GoiEntry): Promise<void> {
-            const goi_doc = await gois_collection.findOne({ name: goiName })
+        addEntry: async function (goiId: string, goiEntry: GoiEntry): Promise<void> {
+            const goi_doc = await gois_collection.findOne({ id: goiId })
             if (!goi_doc) {
-                throw `goi ${goiName} is not found`
+                throw `goi ${goiId} is not found`
             }
-            await goi_entires_collection.insertOne({ goi_name: goiName, ...goiEntry })
+            await goi_entires_collection.insertOne({ goi_id: goiId, ...goiEntry })
         },
 
-        deleteEntry: async function (goiName: string, goiId: string) {
-            goi_entires_collection.deleteOne({ goi_name: goiName, _id: new ObjectId(goiId) })
+        deleteEntry: async function (goiEntryId: string) {
+            goi_entires_collection.deleteOne({ _id: new ObjectId(goiEntryId) })
         },
     }
 }()

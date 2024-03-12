@@ -25,8 +25,7 @@ interface EntryMutation {
 }
 
 function EntryRows(
-    { goiName, goiEntries, editDisabled, onEditActivated, onEditDeactivated }: {
-        goiName: string,
+    { goiEntries, editDisabled, onEditActivated, onEditDeactivated }: {
         goiEntries: Array<GoiEntryData>,
         editDisabled: boolean,
         onEditActivated: () => void,
@@ -53,7 +52,7 @@ function EntryRows(
                     setMutation({ type: 'delete' })
                 }}
                 onConfirm={() => {
-                    deleteEntry(goiName, entry.id!)
+                    deleteEntry(entry.id!)
                     setSelectedIndex(unselectedIndex)
                     onEditDeactivated()
                     router.refresh()
@@ -137,8 +136,8 @@ function EntryRow({
 }
 
 function NewEntryRow(
-    { goiName, editDisabled, onEditActivated, onEditDeactivated }: {
-        goiName: string,
+    { goiId, editDisabled, onEditActivated, onEditDeactivated }: {
+        goiId: string,
         editDisabled: boolean,
         onEditActivated: () => void,
         onEditDeactivated: () => void,
@@ -166,7 +165,7 @@ function NewEntryRow(
                 <IconButton
                     color='success'
                     onClick={() => {
-                        addEntry(goiName, entry)
+                        addEntry(goiId, entry)
                         reset()
                         setEditing(false)
                         router.refresh()
@@ -210,7 +209,7 @@ function NewEntryRow(
     )
 }
 
-export default function EntryTable({ goiName, goiEntries }: { goiName: string, goiEntries: Array<GoiEntryData> }) {
+export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEntries: Array<GoiEntryData> }) {
     const noneEdit = 'none'
     const entriesEdit = 'entries'
     const newEntryEdit = 'new'
@@ -224,14 +223,13 @@ export default function EntryTable({ goiName, goiEntries }: { goiName: string, g
                         sx={{ cursor: 'pointer' }}
                     >
                         <EntryRows
-                            goiName={goiName}
                             goiEntries={goiEntries}
                             editDisabled={!(activeEdit === noneEdit || activeEdit === entriesEdit)}
                             onEditActivated={() => setActiveEdit(entriesEdit)}
                             onEditDeactivated={() => setActiveEdit(noneEdit)}
                         />
                         <NewEntryRow
-                            goiName={goiName}
+                            goiId={goiId}
                             editDisabled={!(activeEdit === noneEdit || activeEdit === newEntryEdit)}
                             onEditActivated={() => setActiveEdit(newEntryEdit)}
                             onEditDeactivated={() => setActiveEdit(noneEdit)}

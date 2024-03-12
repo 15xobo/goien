@@ -10,10 +10,10 @@ export async function deleteGoi(id: string) {
     return goiClient.deleteGoi(id)
 }
 
-export async function addEntry(goiName: string, goiEntry: GoiEntry) {
-    return goiClient.addEntry(goiName, goiEntry)
+export async function addEntry(goiId: string, goiEntry: GoiEntry) {
+    return goiClient.addEntry(goiId, goiEntry)
 }
 
-export async function deleteEntry(goiName: string, goiId: string) {
-    return goiClient.deleteEntry(goiName, goiId)
+export async function deleteEntry(goiEntryId: string) {
+    return goiClient.deleteEntry(goiEntryId)
 }
