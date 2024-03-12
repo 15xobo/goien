@@ -1,5 +1,7 @@
 import { MongoClient, ObjectId } from "mongodb";
 
+import { randomUUID } from "crypto";
+
 export interface GoiEntry {
     id?: string;
     sentence: string;
@@ -8,6 +10,7 @@ export interface GoiEntry {
 }
 
 export interface Goi {
+    id?: string;
     name: string;
 }
 
@@ -20,15 +23,23 @@ const goiClient = function () {
     return {
         listGois: async function (): Promise<Array<Goi>> {
             const goi_docs = await gois_collection.find({}).toArray()
-            return goi_docs.map(doc => ({ name: doc.name }))
+            return goi_docs.map(doc => ({ id: doc.id, name: doc.name }))
+        },
+
+        getGoi: async function (name: string): Promise<Goi> {
+            const goi_doc = await gois_collection.findOne({ name: name })
+            if (!goi_doc) {
+                throw `goi ${name} is not found`
+            }
+            return { id: goi_doc.id, name: goi_doc.name }
         },
 
         addGoi: async function (goi: Goi): Promise<void> {
-            await gois_collection.updateOne({ name: goi.name }, { $set: { name: goi.name } }, { upsert: true })
+            await gois_collection.insertOne({ id: randomUUID(), name: goi.name })
         },
 
-        deleteGoi: async function (name: string): Promise<void> {
-            await gois_collection.deleteOne({ name: name })
+        deleteGoi: async function (id: string): Promise<void> {
+            await gois_collection.deleteOne({ id: id })
         },
 
         listEntries: async function (goiName: string): Promise<Array<GoiEntry>> {

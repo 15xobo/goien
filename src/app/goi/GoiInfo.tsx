@@ -21,7 +21,7 @@ export default function GoiInfo(
             <Button
                 variant='contained' color='error' disabled={!deletable}
                 onClick={() => {
-                    deleteGoi(goi.name)
+                    deleteGoi(goi.id!)
                     router.push('/goi/')
                 }}
             >

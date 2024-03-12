@@ -75,7 +75,7 @@ export default function GoiTable({ gois }: { gois: Array<GoiData>, }) {
                     >
                         {gois.map(goi => {
                             return (
-                                <TableRow key={goi.name}>
+                                <TableRow key={goi.id}>
                                     <TableCell>
                                         <Link href={`/goi/${goi.name}`}>{goi.name}</Link>
                                     </TableCell>
