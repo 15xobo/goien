@@ -1,11 +1,10 @@
 'use client'
 
-import { deleteEntry, deleteGoi } from './actions'
-
 import Button from '@mui/material/Button'
-import { Goi as GoiData } from "../lib/goi"
+import { Goi as GoiData } from "../lib/model"
 import Paper from "@mui/material/Paper"
 import { Typography } from "@mui/material"
+import { deleteGoi } from './actions'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 

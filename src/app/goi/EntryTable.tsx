@@ -5,7 +5,7 @@ import { addEntry, deleteEntry } from './actions'
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import { GoiEntry as GoiEntryData } from '@/app/lib/goi'
+import { GoiEntry as GoiEntryData } from "../lib/model";
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper'
 import RemoveIcon from '@mui/icons-material/Remove';

@@ -1,6 +1,6 @@
 'use client'
 
-import { Goi as GoiData, goiClient } from '@/app/lib/goi'
+import { Goi as GoiData, GoiType } from "../lib/model";
 
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
@@ -25,10 +25,11 @@ function NewGoiDialog({ open, onClose }: {
     onClose: () => void,
 }) {
     const router = useRouter()
-    const [goi, setGoi] = useState<GoiData>({ name: '' })
+    const initGoi = () => { return { name: '', type: GoiType.Default }; }
+    const [goi, setGoi] = useState<GoiData>(initGoi())
 
     function reset() {
-        setGoi({name: ''})
+        setGoi(initGoi())
         onClose()
     }
 
@@ -42,7 +43,7 @@ function NewGoiDialog({ open, onClose }: {
                     fullWidth
                     variant="standard"
                     value={goi.name}
-                    onChange={(event) => setGoi({ name: event.target.value })}
+                    onChange={(event) => setGoi({ ...goi, name: event.target.value })}
                 />
                 <IconButton
                     color='success'

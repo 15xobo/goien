@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from "react"
-import { EnEntry } from "../lib/en"
 import Card from "@mui/material/Card"
-import Typography from "@mui/material/Typography"
 import CardContent from "@mui/material/CardContent"
+import { EnEntry } from "../lib/model"
+import Typography from "@mui/material/Typography"
+import { useState } from "react"
 
 export default function FlashCard({ enEntry }: { enEntry: EnEntry }) {
     const [flipped, setFlipped] = useState(false)
