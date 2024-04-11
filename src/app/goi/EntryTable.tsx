@@ -3,12 +3,18 @@
 import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button'
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import { GoiEntry as GoiEntryData } from "../lib/model";
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper'
-import RemoveIcon from '@mui/icons-material/Remove';
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -19,71 +25,53 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-interface EntryMutation {
-    type: string,
-    entry?: GoiEntryData,
+function EntryRows({ goiEntries }: {
+    goiEntries: Array<GoiEntryData>,
 }
-
-function EntryRows(
-    { goiEntries, editDisabled, onEditActivated, onEditDeactivated }: {
-        goiEntries: Array<GoiEntryData>,
-        editDisabled: boolean,
-        onEditActivated: () => void,
-        onEditDeactivated: () => void,
-    }
 ) {
-    const unselectedIndex = -1
-    const [selectedIndex, setSelectedIndex] = useState<number>(unselectedIndex)
-    const [mutation, setMutation] = useState<EntryMutation | null>(null)
+    const [entryToDelete, setEntryToDelete] = useState<GoiEntryData | null>(null)
     const router = useRouter()
 
-    return goiEntries.map((entry, index) => {
-        return (
-            <EntryRow
-                key={index}
-                goiEntry={entry}
-                deleting={selectedIndex === index && mutation?.type === 'delete'}
-                editDisabled={editDisabled || selectedIndex !== unselectedIndex}
-                onSelect={() => {
-                    setSelectedIndex(index)
-                    onEditActivated()
-                }}
-                onDelete={() => {
-                    setMutation({ type: 'delete' })
-                }}
-                onConfirm={() => {
-                    deleteEntry(entry.id!)
-                    setSelectedIndex(unselectedIndex)
-                    onEditDeactivated()
-                    router.refresh()
-                }}
-                onCancel={() => {
-                    setSelectedIndex(unselectedIndex)
-                    setMutation(null)
-                    onEditDeactivated()
-                }}
-            />
-        )
-    })
+    function handleDeleteEntry() {
+        deleteEntry(entryToDelete!.id!)
+        setEntryToDelete(null)
+        router.refresh()
+    }
+
+    return <>
+        <Dialog
+            open={entryToDelete != null}
+        >
+            <DialogTitle>Delete sentence</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    {entryToDelete?.sentence}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setEntryToDelete(null)}>Cancel</Button>
+                <Button onClick={handleDeleteEntry}>Confirm</Button>
+            </DialogActions>
+        </Dialog>
+        {
+            goiEntries.map((entry, index) => {
+                return (
+                    <EntryRow
+                        key={index}
+                        goiEntry={entry}
+                        onDelete={() => {
+                            setEntryToDelete(entry)
+                        }}
+                    />
+                )
+            })
+        }</>
 }
 
-function EntryRow({
-    goiEntry, deleting, editDisabled, onSelect, onDelete, onConfirm, onCancel }: {
-        goiEntry: GoiEntryData,
-        deleting: boolean,
-        editDisabled: boolean,
-        onSelect: () => void,
-        onDelete: () => void,
-        onConfirm: () => void,
-        onCancel: () => void,
-    }) {
-    const editing = deleting
-    const textStyle = deleting ? {
-        textDecoration: 'line-through',
-        textDecorationThickness: '0.1em',
-    } : {}
-    const textColor = deleting ? 'error' : 'black'
-
+function EntryRow({ goiEntry, onDelete }: {
+    goiEntry: GoiEntryData,
+    onDelete: () => void,
+}) {
     const sentence = goiEntry.sentence
     const [wordStart, wordEnd] = goiEntry.words[0]
     const firstPart = sentence.substring(0, wordStart)
@@ -92,43 +80,23 @@ function EntryRow({
 
     return (
         <TableRow hover>
-            <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
+            <TableCell padding="checkbox">
+            </TableCell>
+            <TableCell padding="checkbox">
                 <IconButton
-                    color='success'
-                    onClick={onConfirm}
+                    onClick={onDelete}
                 >
-                    <CheckIcon />
+                    <DeleteIcon />
                 </IconButton>
             </TableCell>
-            <TableCell padding="checkbox" sx={true ? {} : { visibility: 'hidden' }}>
-                {editing ? (
-                    <IconButton
-                        color='error'
-                        onClick={onCancel}
-                    >
-                        <ClearIcon />
-                    </IconButton>
-                ) : (
-                    <IconButton
-                        disabled={editDisabled}
-                        color='info'
-                        onClick={() => {
-                            onSelect()
-                            onDelete()
-                        }}
-                    >
-                        <RemoveIcon />
-                    </IconButton>
-                )}
-            </TableCell>
             <TableCell >
-                <Typography display="inline" color={textColor} sx={textStyle}>
+                <Typography display="inline">
                     {firstPart}
                 </Typography>
-                <Typography display="inline" color='error' sx={{ ...textStyle, textDecoration: 'underline' }}>
+                <Typography display="inline" color='error' sx={{ textDecoration: 'underline' }}>
                     {wordPart}
                 </Typography>
-                <Typography display="inline" color={textColor} sx={textStyle}>
+                <Typography display="inline">
                     {lastPart}
                 </Typography>
             </TableCell>
@@ -212,7 +180,6 @@ function NewEntryRow(
 
 export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEntries: Array<GoiEntryData> }) {
     const noneEdit = 'none'
-    const entriesEdit = 'entries'
     const newEntryEdit = 'new'
     const [activeEdit, setActiveEdit] = useState(noneEdit)
 
@@ -225,9 +192,6 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
                     >
                         <EntryRows
                             goiEntries={goiEntries}
-                            editDisabled={!(activeEdit === noneEdit || activeEdit === entriesEdit)}
-                            onEditActivated={() => setActiveEdit(entriesEdit)}
-                            onEditDeactivated={() => setActiveEdit(noneEdit)}
                         />
                         <NewEntryRow
                             goiId={goiId}
