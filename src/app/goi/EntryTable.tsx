@@ -71,10 +71,14 @@ function EntryRow({ goiEntry, onDelete }: {
     onDelete: () => void,
 }) {
     const sentence = goiEntry.sentence
-    const [wordStart, wordEnd] = goiEntry.words.length > 0 ? goiEntry.words[0] : [0, 0]
-    const firstPart = sentence.substring(0, wordStart)
-    const wordPart = sentence.substring(wordStart, wordEnd)
-    const lastPart = sentence.substring(wordEnd)
+    const parts = []
+    let lastWordEnd = 0
+    for (let i = 0; i < goiEntry.words.length; ++i) {
+        parts.push([lastWordEnd, goiEntry.words[i][0]])
+        parts.push(goiEntry.words[i])
+        lastWordEnd = goiEntry.words[i][1]
+    }
+    parts.push([lastWordEnd, sentence.length])
 
     return (
         <TableRow hover>
@@ -86,15 +90,15 @@ function EntryRow({ goiEntry, onDelete }: {
                 </IconButton>
             </TableCell>
             <TableCell >
-                <Typography display="inline">
-                    {firstPart}
-                </Typography>
-                <Typography display="inline" color='error' sx={{ textDecoration: 'underline' }}>
-                    {wordPart}
-                </Typography>
-                <Typography display="inline">
-                    {lastPart}
-                </Typography>
+                {
+                    parts.map(([wordStart, wordEnd], index) => index % 2 ?
+                        <Typography key={index} display="inline" color={'error'} sx={{ border: 'thin solid' }}>
+                            {sentence.substring(wordStart, wordEnd)}
+                        </Typography> :
+                        <Typography key={index} display="inline">
+                            {sentence.substring(wordStart, wordEnd)}
+                        </Typography>)
+                }
             </TableCell>
         </TableRow>
     )
@@ -108,10 +112,25 @@ function NewEntryDialog(
     }
 ) {
     const [entry, setEntry] = useState<GoiEntryData | null>(null)
+    const words = entry?.words || []
 
     function handleWordSelection(e: React.SyntheticEvent) {
+        if (!entry) {
+            return
+        }
         const target = e.target as HTMLTextAreaElement
-        setEntry({ ...entry!, words: [[target.selectionStart, target.selectionEnd]] })
+        const [wordStart, wordEnd] = [target.selectionStart, target.selectionEnd].toSorted()
+        if (wordStart == wordEnd) {
+            return
+        }
+        for (let [s, e] of words) {
+            if (s < wordEnd && e > wordStart) {
+                return
+            }
+        }
+        words.push([wordStart, wordEnd])
+        console.log(words.toSorted())
+        setEntry({ ...entry!, words: words.toSorted((a, b) => a[0] - b[0]) })
     }
 
     return (
