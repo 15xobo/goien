@@ -4,8 +4,6 @@ import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -73,15 +71,13 @@ function EntryRow({ goiEntry, onDelete }: {
     onDelete: () => void,
 }) {
     const sentence = goiEntry.sentence
-    const [wordStart, wordEnd] = goiEntry.words[0]
+    const [wordStart, wordEnd] = goiEntry.words.length > 0 ? goiEntry.words[0] : [0, 0]
     const firstPart = sentence.substring(0, wordStart)
     const wordPart = sentence.substring(wordStart, wordEnd)
     const lastPart = sentence.substring(wordEnd)
 
     return (
         <TableRow hover>
-            <TableCell padding="checkbox">
-            </TableCell>
             <TableCell padding="checkbox">
                 <IconButton
                     onClick={onDelete}
@@ -104,84 +100,56 @@ function EntryRow({ goiEntry, onDelete }: {
     )
 }
 
-function NewEntryRow(
-    { goiId, editDisabled, onEditActivated, onEditDeactivated }: {
-        goiId: string,
-        editDisabled: boolean,
-        onEditActivated: () => void,
-        onEditDeactivated: () => void,
+function NewEntryDialog(
+    { open, onCancel, onConfirm }: {
+        open: boolean,
+        onCancel: () => void,
+        onConfirm: (entry: GoiEntryData) => void,
     }
 ) {
-    const emptyEntry = { sentence: '', words: [] }
-    const [entry, setEntry] = useState<GoiEntryData>(emptyEntry)
-    const [editing, setEditing] = useState(false)
-    const router = useRouter()
-
-    function reset() {
-        setEntry(emptyEntry)
-        setEditing(false)
-        onEditDeactivated()
-    }
+    const [entry, setEntry] = useState<GoiEntryData | null>(null)
 
     function handleWordSelection(e: React.SyntheticEvent) {
         const target = e.target as HTMLTextAreaElement
-        setEntry({ ...entry, words: [[target.selectionStart, target.selectionEnd]] })
+        setEntry({ ...entry!, words: [[target.selectionStart, target.selectionEnd]] })
     }
 
     return (
-        <TableRow hover>
-            <TableCell padding="checkbox" sx={editing ? {} : { visibility: 'hidden' }}>
-                <IconButton
-                    color='success'
-                    onClick={() => {
-                        addEntry(goiId, entry)
-                        reset()
-                        setEditing(false)
-                        router.refresh()
-                    }}
-                >
-                    <CheckIcon />
-                </IconButton>
-            </TableCell>
-            <TableCell padding="checkbox">
-                {editing ? (
-                    <IconButton
-                        color='error'
-                        onClick={reset}
-                    >
-                        <ClearIcon />
-                    </IconButton>
-                ) : (
-                    <IconButton
-                        disabled={editDisabled}
-                        color='info'
-                        onClick={() => {
-                            onEditActivated()
-                            setEditing(true)
-                        }}
-                    >
-                        <AddIcon />
-                    </IconButton>
-                )}
-            </TableCell>
-            <TableCell sx={editing ? {} : { visibility: 'hidden' }} onMouseUp={handleWordSelection}>
+        <Dialog open={open} >
+            <DialogTitle>
+                Add sentence
+            </DialogTitle>
+            <DialogContent>
                 <TextField
                     variant='standard'
-                    size="small"
                     fullWidth
                     multiline
-                    value={entry.sentence}
-                    onChange={(event) => setEntry({ ...entry, sentence: event.target.value })}
+                    value={entry?.sentence}
+                    onMouseUp={handleWordSelection}
+                    onChange={(event) => setEntry({ sentence: event.target.value, words: [] })}
                 />
-            </TableCell>
-        </TableRow>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onCancel}>
+                    Cancel
+                </Button>
+                <Button
+                    disabled={entry == null}
+                    onClick={() => {
+                        onConfirm(entry!)
+                        setEntry(null)
+                    }}
+                >
+                    Confirm
+                </Button>
+            </DialogActions>
+        </Dialog>
     )
 }
 
 export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEntries: Array<GoiEntryData> }) {
-    const noneEdit = 'none'
-    const newEntryEdit = 'new'
-    const [activeEdit, setActiveEdit] = useState(noneEdit)
+    const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
+    const router = useRouter()
 
     return (
         <Paper >
@@ -193,15 +161,21 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
                         <EntryRows
                             goiEntries={goiEntries}
                         />
-                        <NewEntryRow
-                            goiId={goiId}
-                            editDisabled={!(activeEdit === noneEdit || activeEdit === newEntryEdit)}
-                            onEditActivated={() => setActiveEdit(newEntryEdit)}
-                            onEditDeactivated={() => setActiveEdit(noneEdit)}
-                        />
                     </TableBody>
                 </Table>
             </TableContainer>
+            <NewEntryDialog
+                open={newEntryDialogOpen}
+                onCancel={() => setNewEntryDialogOpen(false)}
+                onConfirm={(entry) => {
+                    addEntry(goiId, entry)
+                    setNewEntryDialogOpen(false)
+                    router.refresh()
+                }}
+            />
+            <IconButton onClick={() => setNewEntryDialogOpen(true)}>
+                <AddIcon />
+            </IconButton>
         </Paper>
 
     )
