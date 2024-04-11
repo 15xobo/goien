@@ -84,7 +84,8 @@ function EntryRow({
     } : {}
     const textColor = deleting ? 'error' : 'black'
 
-    const {sentence, wordStart, wordEnd} = goiEntry
+    const sentence = goiEntry.sentence
+    const [wordStart, wordEnd] = goiEntry.words[0]
     const firstPart = sentence.substring(0, wordStart)
     const wordPart = sentence.substring(wordStart, wordEnd)
     const lastPart = sentence.substring(wordEnd)
@@ -124,7 +125,7 @@ function EntryRow({
                 <Typography display="inline" color={textColor} sx={textStyle}>
                     {firstPart}
                 </Typography>
-                <Typography display="inline" color='error' sx={{...textStyle, textDecoration: 'underline'}}>
+                <Typography display="inline" color='error' sx={{ ...textStyle, textDecoration: 'underline' }}>
                     {wordPart}
                 </Typography>
                 <Typography display="inline" color={textColor} sx={textStyle}>
@@ -143,7 +144,7 @@ function NewEntryRow(
         onEditDeactivated: () => void,
     }
 ) {
-    const emptyEntry = { sentence: '', wordStart: 0, wordEnd: 0 }
+    const emptyEntry = { sentence: '', words: [] }
     const [entry, setEntry] = useState<GoiEntryData>(emptyEntry)
     const [editing, setEditing] = useState(false)
     const router = useRouter()
@@ -156,7 +157,7 @@ function NewEntryRow(
 
     function handleWordSelection(e: React.SyntheticEvent) {
         const target = e.target as HTMLTextAreaElement
-        setEntry({ ...entry, wordStart: target.selectionStart, wordEnd: target.selectionEnd })
+        setEntry({ ...entry, words: [[target.selectionStart, target.selectionEnd]] })
     }
 
     return (

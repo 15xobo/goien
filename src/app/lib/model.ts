@@ -13,8 +13,7 @@ export enum GoiType {
 export interface GoiEntry {
     id?: string;
     sentence: string;
-    wordStart: number;
-    wordEnd: number;
+    words: Array<[number, number]>;
 }
 
 export interface EnEntry {
