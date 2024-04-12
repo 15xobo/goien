@@ -3,7 +3,7 @@
 import { Goi as GoiData, GoiType } from "../lib/model";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from '@mui/icons-material/AddCircle';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import Dialog from '@mui/material/Dialog'
@@ -12,17 +12,14 @@ import FormControl from "@mui/material/FormControl/FormControl";
 import IconButton from '@mui/material/IconButton';
 import InputLabel from "@mui/material/InputLabel";
 import Link from 'next/link';
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import MenuItem from "@mui/material/MenuItem";
-import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import { addGoi } from './actions';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react'
+import { useState } from 'react';
 
 function NewGoiDialog({ open, onClose }: {
     open: boolean,
@@ -86,32 +83,25 @@ function NewGoiDialog({ open, onClose }: {
     )
 }
 
-export default function GoiTable({ gois }: { gois: Array<GoiData>, }) {
+export default function GoiList({ gois }: { gois: Array<GoiData>, }) {
     const [newGoiDialogOpen, setNewGoiDialogOpen] = useState(false)
 
     return (
-        <Paper>
-            <TableContainer>
-                <Table>
-                    <TableBody
-                        sx={{ cursor: 'pointer' }}
-                    >
-                        {gois.map(goi => {
-                            return (
-                                <TableRow key={goi.id}>
-                                    <TableCell>
-                                        <Link href={`/goi/${goi.id}`}>{goi.name}</Link>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <IconButton onClick={() => setNewGoiDialogOpen(true)}>
-                <AddIcon />
-            </IconButton>
+        <List>
+            {gois.map(goi => (
+                <ListItem key={goi.id}>
+                    <ListItemButton>
+                        <Link href={`/goi/${goi.id}`}>{goi.name}</Link>
+                    </ListItemButton>
+                </ListItem>
+            )
+            )}
+            <ListItem>
+                <ListItemButton onClick={() => setNewGoiDialogOpen(true)}>
+                    <AddIcon />
+                </ListItemButton>
+            </ListItem>
             <NewGoiDialog open={newGoiDialogOpen} onClose={() => setNewGoiDialogOpen(false)} />
-        </Paper>
+        </List>
     )
 }
