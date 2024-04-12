@@ -8,6 +8,10 @@ export async function addGoi(goi: Goi) {
     return goiClient.addGoi(goi)
 }
 
+export async function updateGoi(goi: Goi) {
+    return goiClient.updateGoi(goi)
+}
+
 export async function deleteGoi(id: string) {
     return goiClient.deleteGoi(id)
 }

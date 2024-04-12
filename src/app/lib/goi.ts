@@ -29,6 +29,10 @@ const goiClient = function () {
             await goi_entires_collection.insertOne({ goi_id: id, entries: [] })
         },
 
+        updateGoi: async function (goi: Goi): Promise<void> {
+            await gois_collection.updateOne({ id: goi.id }, { $set: { name: goi.name } })
+        },
+
         deleteGoi: async function (id: string): Promise<void> {
             await gois_collection.deleteOne({ id: id })
         },
