@@ -18,18 +18,17 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Paper from '@mui/material/Paper'
 import { Reorder } from "framer-motion"
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryItem({ goiEntry, onDelete, onEdit, index }: {
+function EntryItem({ goiEntry, onDelete, onEdit, order }: {
     goiEntry: GoiEntryData,
     onDelete: () => void,
     onEdit: () => void,
-    index: number,
+    order: number,
 }) {
     const sentence = goiEntry.sentence
     const parts = []
@@ -42,7 +41,7 @@ function EntryItem({ goiEntry, onDelete, onEdit, index }: {
     parts.push([lastWordEnd, sentence.length])
 
     return (
-        <ListItem component={Reorder.Item} value={index} dragListener={false}>
+        <ListItem component={Reorder.Item} value={order} dragListener={false}>
             <ListItemIcon onClick={onDelete}>
                 <IconButton >
                     <DeleteIcon />
@@ -68,12 +67,12 @@ function EntryItem({ goiEntry, onDelete, onEdit, index }: {
     )
 }
 
-function NewEntryItem({ onAdd, index }: {
+function NewEntryItem({ onAdd, order }: {
     onAdd: () => void,
-    index: number,
+    order: number,
 }) {
     return (
-        <ListItem component={Reorder.Item} value={index} >
+        <ListItem component={Reorder.Item} value={order} >
             <ListItemIcon>
                 <IconButton onClick={onAdd}>
                     <AddIcon />
@@ -173,80 +172,79 @@ function DeleteEntryDialog(
     )
 }
 
-export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
+export default function EntryList({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
     const [editing, setEditing] = useState(false)
-    const [entryIndex, setEntryIndex] = useState<number>(-1)
-    const [newEntryPosition, setNewEntryPosition] = useState(goiEntries.length)
+    const [modifyPosition, setModifyPosition] = useState<number>(-1)
+    const [insertPosition, setInsertPosition] = useState(goiEntries.length)
     const [entry, setEntry] = useState<GoiEntryData | null>(null)
     const router = useRouter()
 
     const reorderedIndexes = Array.from(Array(goiEntries.length).keys())
-    reorderedIndexes.splice(newEntryPosition, 0, goiEntries.length)
+    reorderedIndexes.splice(insertPosition, 0, goiEntries.length)
 
     return (
-        <Paper >
-            <List>
-                <Reorder.Group axis="y" values={reorderedIndexes} onReorder={(indexes) => {
-                    setNewEntryPosition(indexes.indexOf(goiEntries.length))
-                }}>
-                    {reorderedIndexes.map((index) => (
-                        index == goiEntries.length ? (
-                            <NewEntryItem
-                                key={index}
-                                onAdd={() => setEditing(true)}
-                                index={index}
-                            />
-                        ) : (
-                            <EntryItem
-                                key={index}
-                                goiEntry={goiEntries[index]}
-                                onDelete={() => setEntryIndex(index)}
-                                onEdit={() => {
-                                    setEditing(true)
-                                    setEntryIndex(index)
-                                    setEntry(structuredClone(goiEntries[index]))
-                                }}
-                                index={index}
-                            />
-                        )
-                    ))}
-                </Reorder.Group>
-
-            </List>
+        <List
+            component={Reorder.Group}
+            axis="y"
+            values={reorderedIndexes}
+            onReorder={(indexes) => {
+                setInsertPosition(indexes.indexOf(goiEntries.length))
+            }}
+        >
+            {reorderedIndexes.map((index) => (
+                index == goiEntries.length ? (
+                    <NewEntryItem
+                        key={index}
+                        onAdd={() => setEditing(true)}
+                        order={index}
+                    />
+                ) : (
+                    <EntryItem
+                        key={index}
+                        goiEntry={goiEntries[index]}
+                        onDelete={() => setModifyPosition(index)}
+                        onEdit={() => {
+                            setEditing(true)
+                            setModifyPosition(index)
+                            setEntry(structuredClone(goiEntries[index]))
+                        }}
+                        order={index}
+                    />
+                )
+            ))}
             <DeleteEntryDialog
-                open={!editing && entryIndex >= 0}
-                entry={entryIndex >= 0 ? goiEntries[entryIndex] : null}
-                onCancel={() => setEntryIndex(-1)}
+                open={!editing && modifyPosition >= 0}
+                entry={modifyPosition >= 0 ? goiEntries[modifyPosition] : null}
+                onCancel={() => setModifyPosition(-1)}
                 onConfirm={() => {
-                    deleteEntry(goi.id!, entryIndex)
-                    setEntryIndex(-1)
+                    deleteEntry(goi.id!, modifyPosition)
+                    setModifyPosition(-1)
                     router.refresh()
                 }}
             />
             <EditEntryDialog
                 open={editing}
                 entry={entry}
-                oldEntry={entryIndex >= 0 ? goiEntries[entryIndex] : null}
+                oldEntry={modifyPosition >= 0 ? goiEntries[modifyPosition] : null}
                 onChangeEntry={setEntry}
                 onCancel={() => {
                     setEntry(null)
                     setEditing(false)
-                    setEntryIndex(-1)
+                    setModifyPosition(-1)
                 }}
                 onConfirm={() => {
-                    if (entryIndex >= 0) {
-                        updateEntry(goi.id!, entryIndex, entry!)
+                    if (modifyPosition >= 0) {
+                        updateEntry(goi.id!, modifyPosition, entry!)
                     } else {
-                        addEntry(goi.id!, newEntryPosition, entry!)
+                        addEntry(goi.id!, insertPosition, entry!)
                     }
                     setEntry(null)
                     setEditing(false)
-                    setEntryIndex(-1)
-                    setNewEntryPosition(newEntryPosition + 1)
+                    setModifyPosition(-1)
+                    setInsertPosition(insertPosition + 1)
                     router.refresh()
                 }}
             />
-        </Paper>
-
+        </List>
     )
 }
