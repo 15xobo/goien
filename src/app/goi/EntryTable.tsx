@@ -4,6 +4,7 @@ import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -113,6 +114,7 @@ function NewEntryDialog(
 ) {
     const [entry, setEntry] = useState<GoiEntryData | null>(null)
     const words = entry?.words || []
+    const sentence = entry?.sentence || ''
 
     function handleWordSelection(e: React.SyntheticEvent) {
         if (!entry) {
@@ -147,6 +149,15 @@ function NewEntryDialog(
                     onMouseUp={handleWordSelection}
                     onChange={(event) => setEntry({ sentence: event.target.value, words: [] })}
                 />
+                {
+                    words.map(([wordStart, wordEnd], index) =>
+                        <Chip
+                            key={index}
+                            label={sentence.substring(wordStart, wordEnd)}
+                            onDelete={() => { setEntry({ ...entry!, words: words.filter((w, i) => i != index) }) }}
+                        />
+                    )
+                }
             </DialogContent>
             <DialogActions>
                 <Button onClick={onCancel}>
