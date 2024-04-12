@@ -37,6 +37,10 @@ const enClient = function () {
         attachGoi: async function (id: string, goiId: string) {
             await ens_collection.updateOne({ id: id }, { $addToSet: { 'goi_ids': goiId } })
         },
+
+        detachGoi: async function (id: string, goiId: string) {
+            await ens_collection.updateOne({ id: id }, { $pull: { 'goi_ids': goiId } })
+        },
     }
 }()
 

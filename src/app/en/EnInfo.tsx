@@ -1,7 +1,7 @@
 'use client'
 
 import { En as EnData, Goi as GoiData } from "../lib/model"
-import { attachGoi, deleteEn, udpateEn } from './actions'
+import { attachGoi, deleteEn, detachGoi, udpateEn } from './actions'
 import { getGoi, listGois } from '../goi/actions';
 import { useEffect, useState } from 'react'
 
@@ -18,7 +18,7 @@ import Link from "next/link"
 import LinkIcon from '@mui/icons-material/Link';
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem';
-import  ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import MenuItem from '@mui/material/MenuItem'
 import Paper from "@mui/material/Paper"
 import Select from "@mui/material/Select";
@@ -165,6 +165,14 @@ export default function EnInfo(
                 {en.goiIds.map((goiId, index) => (
                     gois[index] &&
                     <ListItem key={goiId}>
+                        <ListItemIcon
+                            onClick={() => {
+                                detachGoi(en.id, goiId)
+                                router.refresh()
+                            }}
+                        >
+                            <DeleteIcon color='primary' />
+                        </ListItemIcon>
                         {gois[index]?.name}
                         <Link href={`/goi/${goiId}`}>
                             <LinkIcon />
@@ -173,7 +181,7 @@ export default function EnInfo(
                 ))}
                 <ListItem>
                     <ListItemIcon onClick={() => setAddGoiDialogOpen(true)}>
-                        <AddIcon color='primary'/>
+                        <AddIcon color='primary' />
                     </ListItemIcon>
                 </ListItem>
             </List>

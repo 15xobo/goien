@@ -26,3 +26,7 @@ export async function deleteEn(id: string) {
 export async function attachGoi(id: string, goiId: string) {
     await enClient.attachGoi(id, goiId)
 }
+
+export async function detachGoi(id: string, goiId: string) {
+    await enClient.detachGoi(id, goiId)
+}
