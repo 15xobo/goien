@@ -119,7 +119,8 @@ function NewEntryDialog(
             return
         }
         const target = e.target as HTMLTextAreaElement
-        const [wordStart, wordEnd] = [target.selectionStart, target.selectionEnd].toSorted()
+        const [wordStart, wordEnd] = [target.selectionStart, target.selectionEnd].toSorted((a, b) => a - b)
+        console.log(wordEnd, wordStart)
         if (wordStart == wordEnd) {
             return
         }
