@@ -25,7 +25,7 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRow({ goiEntry, onDelete, onEdit, index }: {
+function EntryItem({ goiEntry, onDelete, onEdit, index }: {
     goiEntry: GoiEntryData,
     onDelete: () => void,
     onEdit: () => void,
@@ -68,6 +68,20 @@ function EntryRow({ goiEntry, onDelete, onEdit, index }: {
     )
 }
 
+function NewEntryItem({ onAdd, index }: {
+    onAdd: () => void,
+    index: number,
+}) {
+    return (
+        <ListItem component={Reorder.Item} value={index} >
+            <ListItemIcon>
+                <IconButton onClick={onAdd}>
+                    <AddIcon />
+                </IconButton>
+            </ListItemIcon>
+        </ListItem>
+    )
+}
 function EditEntryDialog(
     { entry, oldEntry, open, onChangeEntry, onCancel, onConfirm }: {
         entry: GoiEntryData | null,
@@ -148,7 +162,7 @@ function DeleteEntryDialog(
             <DialogTitle>{`Delete sentence "${entry?.sentence}"`}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    
+
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -177,16 +191,13 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 }}>
                     {reorderedIndexes.map((index) => (
                         index == goiEntries.length ? (
-                            <ListItem key={index} component={Reorder.Item} value={index} >
-                                <ListItemIcon>
-                                    <IconButton onClick={() => setEditing(true)}>
-                                        <AddIcon />
-                                    </IconButton>
-                                </ListItemIcon>
-                            </ListItem>
-
+                            <NewEntryItem
+                                key={index}
+                                onAdd={() => setEditing(true)}
+                                index={index}
+                            />
                         ) : (
-                            <EntryRow
+                            <EntryItem
                                 key={index}
                                 goiEntry={goiEntries[index]}
                                 onDelete={() => setEntryIndex(index)}
