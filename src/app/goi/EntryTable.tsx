@@ -1,7 +1,7 @@
 'use client'
 
 import { Goi as GoiData, GoiEntry as GoiEntryData, GoiType } from "../lib/model";
-import { addEntry, deleteEntry } from './actions'
+import { addEntry, deleteEntry, updateEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
@@ -12,6 +12,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -24,9 +25,10 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRow({ goiEntry, onDelete, index }: {
+function EntryRow({ goiEntry, onDelete, onEdit, index }: {
     goiEntry: GoiEntryData,
     onDelete: () => void,
+    onEdit: () => void,
     index: number,
 }) {
     const sentence = goiEntry.sentence
@@ -46,6 +48,11 @@ function EntryRow({ goiEntry, onDelete, index }: {
                     <DeleteIcon />
                 </IconButton>
             </ListItemIcon>
+            <ListItemIcon onClick={onEdit}>
+                <IconButton >
+                    <EditIcon />
+                </IconButton>
+            </ListItemIcon>
             <ListItemText >
                 {
                     parts.map(([wordStart, wordEnd], index) => index % 2 ?
@@ -61,9 +68,10 @@ function EntryRow({ goiEntry, onDelete, index }: {
     )
 }
 
-function NewEntryDialog(
-    { entry, open, onChangeEntry, onCancel, onConfirm }: {
+function EditEntryDialog(
+    { entry, oldEntry, open, onChangeEntry, onCancel, onConfirm }: {
         entry: GoiEntryData | null,
+        oldEntry: GoiEntryData | null,
         open: boolean,
         onChangeEntry: (entry: GoiEntryData) => void,
         onCancel: () => void,
@@ -94,7 +102,7 @@ function NewEntryDialog(
     return (
         <Dialog open={open} >
             <DialogTitle>
-                Add sentence
+                {oldEntry ? `Edit sentence "${oldEntry.sentence}"` : 'Add sentence'}
             </DialogTitle>
             <DialogContent>
                 <TextField
@@ -128,7 +136,7 @@ function NewEntryDialog(
 }
 
 export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
-    const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
+    const [editing, setEditing] = useState(false)
     const [entryIndex, setEntryIndex] = useState<number>(-1)
     const [newEntryPosition, setNewEntryPosition] = useState(goiEntries.length)
     const [entry, setEntry] = useState<GoiEntryData | null>(null)
@@ -147,7 +155,7 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                         index == goiEntries.length ? (
                             <ListItem key={index} component={Reorder.Item} value={index} >
                                 <ListItemIcon>
-                                    <IconButton onClick={() => setNewEntryDialogOpen(true)}>
+                                    <IconButton onClick={() => setEditing(true)}>
                                         <AddIcon />
                                     </IconButton>
                                 </ListItemIcon>
@@ -158,6 +166,11 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                                 key={index}
                                 goiEntry={goiEntries[index]}
                                 onDelete={() => setEntryIndex(index)}
+                                onEdit={() => {
+                                    setEditing(true)
+                                    setEntryIndex(index)
+                                    setEntry(structuredClone(goiEntries[index]))
+                                }}
                                 index={index}
                             />
                         )
@@ -165,7 +178,7 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 </Reorder.Group>
 
             </List>
-            <Dialog open={entryIndex >= 0}>
+            <Dialog open={!editing && entryIndex >= 0}>
                 <DialogTitle>Delete sentence</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -185,18 +198,25 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                     </Button>
                 </DialogActions>
             </Dialog>
-            <NewEntryDialog
-                open={newEntryDialogOpen}
+            <EditEntryDialog
+                open={editing}
                 entry={entry}
+                oldEntry={entryIndex >= 0 ? goiEntries[entryIndex] : null}
                 onChangeEntry={setEntry}
                 onCancel={() => {
                     setEntry(null)
-                    setNewEntryDialogOpen(false)
+                    setEditing(false)
+                    setEntryIndex(-1)
                 }}
                 onConfirm={() => {
-                    addEntry(goi.id!, newEntryPosition, entry!)
+                    if (entryIndex >= 0) {
+                        updateEntry(goi.id!, entryIndex, entry!)
+                    } else {
+                        addEntry(goi.id!, newEntryPosition, entry!)
+                    }
                     setEntry(null)
-                    setNewEntryDialogOpen(false)
+                    setEditing(false)
+                    setEntryIndex(-1)
                     setNewEntryPosition(newEntryPosition + 1)
                     router.refresh()
                 }}

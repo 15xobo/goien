@@ -42,6 +42,10 @@ const goiClient = function () {
             await goi_entires_collection.updateOne({goi_id: goiId}, {$push: {entries: {$each: [goiEntry], $position: index}}})
         },
 
+        updateEntry: async function (goiId: string, entryIndex: number, entry: GoiEntry) {
+            await goi_entires_collection.updateOne({ goi_id: goiId }, { $set: { [`entries.${entryIndex}`]: entry } })
+        },
+
         deleteEntry: async function (goiId: string, entryIndex: number) {
             await goi_entires_collection.updateOne({ goi_id: goiId }, { $unset: { [`entries.${entryIndex}`]: null } })
             await goi_entires_collection.updateOne({ goi_id: goiId }, { $pull: { entries: null } })
