@@ -41,13 +41,13 @@ const goiClient = function () {
             return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, words: doc.words || [[doc.wordStart, doc.wordEnd]] } })
         },
 
-        addEntry: async function (goiId: string, goiEntry: GoiEntry): Promise<void> {
+        addEntry: async function (goiId: string, index: number, goiEntry: GoiEntry): Promise<void> {
             const goi_doc = await gois_collection.findOne({ id: goiId })
             if (!goi_doc) {
                 throw `goi ${goiId} is not found`
             }
             if (goi_doc.type == GoiType.Article) {
-                await articles_collection.updateOne({goi_id: goiId}, {$push: {entries: goiEntry}})
+                await articles_collection.updateOne({goi_id: goiId}, {$push: {entries: {$each: [goiEntry], $position: index}}})
                 return
             }
             await goi_entires_collection.insertOne({ goi_id: goiId, ...goiEntry })

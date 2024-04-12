@@ -197,7 +197,7 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 open={newEntryDialogOpen}
                 onCancel={() => setNewEntryDialogOpen(false)}
                 onConfirm={(entry) => {
-                    addEntry(goi.id!, entry)
+                    addEntry(goi.id!, newEntryPosition, entry)
                     setNewEntryDialogOpen(false)
                     setNewEntryPosition(newEntryPosition + 1)
                     router.refresh()
