@@ -1,7 +1,7 @@
 'use client'
 
 import { Goi as GoiData, GoiEntry as GoiEntryData, GoiType } from "../lib/model";
-import { addEntry, deleteArticleEntry, deleteEntry } from './actions'
+import { addEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
@@ -143,16 +143,6 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
     const reorderedIndexes = Array.from(Array(goiEntries.length).keys())
     reorderedIndexes.splice(newEntryPosition, 0, goiEntries.length)
 
-    function handleDeleteEntry() {
-        if (goi.type == GoiType.Article) {
-            deleteArticleEntry(goi.id!, entryIndex)
-        } else {
-            deleteEntry(goiEntries[entryIndex].id!)
-        }
-        setEntryIndex(-1)
-        router.refresh()
-    }
-
     return (
         <Paper >
             <List>
@@ -190,7 +180,15 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setEntryIndex(-1)}>Cancel</Button>
-                    <Button onClick={handleDeleteEntry}>Confirm</Button>
+                    <Button
+                        onClick={() => {
+                            deleteEntry(goi.id!, entryIndex)
+                            setEntryIndex(-1)
+                            router.refresh()
+                        }}
+                    >
+                        Confirm
+                    </Button>
                 </DialogActions>
             </Dialog>
             <NewEntryDialog
