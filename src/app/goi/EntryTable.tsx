@@ -23,31 +23,32 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRows({ goiEntries }: {
+function EntryRows({ goiEntries, onDeleteEntry }: {
     goiEntries: Array<GoiEntryData>,
+    onDeleteEntry: (entryIndex: number) => void
 }
 ) {
-    const [entryToDelete, setEntryToDelete] = useState<GoiEntryData | null>(null)
+    const [entryIndex, setEntryIndex] = useState<number>(-1)
     const router = useRouter()
 
     function handleDeleteEntry() {
-        deleteEntry(entryToDelete!.id!)
-        setEntryToDelete(null)
+        onDeleteEntry(entryIndex)
+        setEntryIndex(-1)
         router.refresh()
     }
 
     return <>
         <Dialog
-            open={entryToDelete != null}
+            open={entryIndex >= 0}
         >
             <DialogTitle>Delete sentence</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    {entryToDelete?.sentence}
+                    {entryIndex >= 0 ? goiEntries[entryIndex].sentence : null}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setEntryToDelete(null)}>Cancel</Button>
+                <Button onClick={() => setEntryIndex(-1)}>Cancel</Button>
                 <Button onClick={handleDeleteEntry}>Confirm</Button>
             </DialogActions>
         </Dialog>
@@ -58,7 +59,7 @@ function EntryRows({ goiEntries }: {
                         key={index}
                         goiEntry={entry}
                         onDelete={() => {
-                            setEntryToDelete(entry)
+                            setEntryIndex(index)
                         }}
                     />
                 )
@@ -183,6 +184,9 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
             <List>
                 <EntryRows
                     goiEntries={goiEntries}
+                    onDeleteEntry={entryIndex =>
+                        deleteEntry(goiEntries[entryIndex].id!)
+                    }
                 />
                 <ListItem>
                     <ListItemIcon>
