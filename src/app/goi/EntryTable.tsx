@@ -62,13 +62,14 @@ function EntryRow({ goiEntry, onDelete, index }: {
 }
 
 function NewEntryDialog(
-    { open, onCancel, onConfirm }: {
+    { entry, open, onChangeEntry, onCancel, onConfirm }: {
+        entry: GoiEntryData | null,
         open: boolean,
+        onChangeEntry: (entry: GoiEntryData) => void,
         onCancel: () => void,
-        onConfirm: (entry: GoiEntryData) => void,
+        onConfirm: () => void,
     }
 ) {
-    const [entry, setEntry] = useState<GoiEntryData | null>(null)
     const words = entry?.words || []
     const sentence = entry?.sentence || ''
 
@@ -78,7 +79,6 @@ function NewEntryDialog(
         }
         const target = e.target as HTMLTextAreaElement
         const [wordStart, wordEnd] = [target.selectionStart, target.selectionEnd].toSorted((a, b) => a - b)
-        console.log(wordEnd, wordStart)
         if (wordStart == wordEnd) {
             return
         }
@@ -88,8 +88,7 @@ function NewEntryDialog(
             }
         }
         words.push([wordStart, wordEnd])
-        console.log(words.toSorted())
-        setEntry({ ...entry!, words: words.toSorted((a, b) => a[0] - b[0]) })
+        onChangeEntry({ ...entry!, words: words.toSorted((a, b) => a[0] - b[0]) })
     }
 
     return (
@@ -104,14 +103,14 @@ function NewEntryDialog(
                     multiline
                     value={entry?.sentence}
                     onMouseUp={handleWordSelection}
-                    onChange={(event) => setEntry({ sentence: event.target.value, words: [] })}
+                    onChange={(event) => onChangeEntry({ sentence: event.target.value, words: [] })}
                 />
                 {
                     words.map(([wordStart, wordEnd], index) =>
                         <Chip
                             key={index}
                             label={sentence.substring(wordStart, wordEnd)}
-                            onDelete={() => { setEntry({ ...entry!, words: words.filter((w, i) => i != index) }) }}
+                            onDelete={() => { onChangeEntry({ ...entry!, words: words.filter((w, i) => i != index) }) }}
                         />
                     )
                 }
@@ -120,13 +119,7 @@ function NewEntryDialog(
                 <Button onClick={onCancel}>
                     Cancel
                 </Button>
-                <Button
-                    disabled={entry == null}
-                    onClick={() => {
-                        onConfirm(entry!)
-                        setEntry(null)
-                    }}
-                >
+                <Button disabled={entry == null} onClick={onConfirm}>
                     Confirm
                 </Button>
             </DialogActions>
@@ -138,6 +131,7 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
     const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
     const [entryIndex, setEntryIndex] = useState<number>(-1)
     const [newEntryPosition, setNewEntryPosition] = useState(goiEntries.length)
+    const [entry, setEntry] = useState<GoiEntryData | null>(null)
     const router = useRouter()
 
     const reorderedIndexes = Array.from(Array(goiEntries.length).keys())
@@ -193,9 +187,15 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
             </Dialog>
             <NewEntryDialog
                 open={newEntryDialogOpen}
-                onCancel={() => setNewEntryDialogOpen(false)}
-                onConfirm={(entry) => {
-                    addEntry(goi.id!, newEntryPosition, entry)
+                entry={entry}
+                onChangeEntry={setEntry}
+                onCancel={() => {
+                    setEntry(null)
+                    setNewEntryDialogOpen(false)
+                }}
+                onConfirm={() => {
+                    addEntry(goi.id!, newEntryPosition, entry!)
+                    setEntry(null)
                     setNewEntryDialogOpen(false)
                     setNewEntryPosition(newEntryPosition + 1)
                     router.refresh()
