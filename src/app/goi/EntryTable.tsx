@@ -23,50 +23,6 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRows({ goiEntries, onDeleteEntry }: {
-    goiEntries: Array<GoiEntryData>,
-    onDeleteEntry: (entryIndex: number) => void
-}
-) {
-    const [entryIndex, setEntryIndex] = useState<number>(-1)
-    const router = useRouter()
-
-    function handleDeleteEntry() {
-        onDeleteEntry(entryIndex)
-        setEntryIndex(-1)
-        router.refresh()
-    }
-
-    return <>
-        <Dialog
-            open={entryIndex >= 0}
-        >
-            <DialogTitle>Delete sentence</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    {entryIndex >= 0 ? goiEntries[entryIndex].sentence : null}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={() => setEntryIndex(-1)}>Cancel</Button>
-                <Button onClick={handleDeleteEntry}>Confirm</Button>
-            </DialogActions>
-        </Dialog>
-        {
-            goiEntries.map((entry, index) => {
-                return (
-                    <EntryRow
-                        key={index}
-                        goiEntry={entry}
-                        onDelete={() => {
-                            setEntryIndex(index)
-                        }}
-                    />
-                )
-            })
-        }</>
-}
-
 function EntryRow({ goiEntry, onDelete }: {
     goiEntry: GoiEntryData,
     onDelete: () => void,
@@ -178,21 +134,31 @@ function NewEntryDialog(
 
 export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
     const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
+    const [entryIndex, setEntryIndex] = useState<number>(-1)
     const router = useRouter()
+
+    function handleDeleteEntry() {
+        if (goi.type == GoiType.Article) {
+            deleteArticleEntry(goi.id!, entryIndex)
+        } else {
+            deleteEntry(goiEntries[entryIndex].id!)
+        }
+        setEntryIndex(-1)
+        router.refresh()
+    }
 
     return (
         <Paper >
             <List>
-                <EntryRows
-                    goiEntries={goiEntries}
-                    onDeleteEntry={entryIndex => {
-                        if (goi.type == GoiType.Article) {
-                            deleteArticleEntry(goi.id!, entryIndex)
-                        } else {
-                            deleteEntry(goiEntries[entryIndex].id!)
-                        }
-                    }}
-                />
+                {
+                    goiEntries.map((entry, index) =>
+                        <EntryRow
+                            key={index}
+                            goiEntry={entry}
+                            onDelete={() => setEntryIndex(index)}
+                        />
+                    )
+                }
                 <ListItem>
                     <ListItemIcon>
                         <IconButton onClick={() => setNewEntryDialogOpen(true)}>
@@ -201,6 +167,18 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                     </ListItemIcon>
                 </ListItem>
             </List>
+            <Dialog open={entryIndex >= 0}>
+                <DialogTitle>Delete sentence</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {entryIndex >= 0 ? goiEntries[entryIndex].sentence : null}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEntryIndex(-1)}>Cancel</Button>
+                    <Button onClick={handleDeleteEntry}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
             <NewEntryDialog
                 open={newEntryDialogOpen}
                 onCancel={() => setNewEntryDialogOpen(false)}
