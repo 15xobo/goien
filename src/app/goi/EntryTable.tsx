@@ -13,12 +13,11 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import { GoiEntry as GoiEntryData } from "../lib/model";
 import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
@@ -82,15 +81,13 @@ function EntryRow({ goiEntry, onDelete }: {
     parts.push([lastWordEnd, sentence.length])
 
     return (
-        <TableRow hover>
-            <TableCell padding="checkbox">
-                <IconButton
-                    onClick={onDelete}
-                >
+        <ListItem>
+            <ListItemIcon onClick={onDelete}>
+                <IconButton >
                     <DeleteIcon />
                 </IconButton>
-            </TableCell>
-            <TableCell >
+            </ListItemIcon>
+            <ListItemText >
                 {
                     parts.map(([wordStart, wordEnd], index) => index % 2 ?
                         <Typography key={index} display="inline" color={'error'} sx={{ border: 'thin solid' }}>
@@ -100,8 +97,8 @@ function EntryRow({ goiEntry, onDelete }: {
                             {sentence.substring(wordStart, wordEnd)}
                         </Typography>)
                 }
-            </TableCell>
-        </TableRow>
+            </ListItemText>
+        </ListItem>
     )
 }
 
@@ -183,17 +180,18 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
 
     return (
         <Paper >
-            <TableContainer>
-                <Table>
-                    <TableBody
-                        sx={{ cursor: 'pointer' }}
-                    >
-                        <EntryRows
-                            goiEntries={goiEntries}
-                        />
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <List>
+                <EntryRows
+                    goiEntries={goiEntries}
+                />
+                <ListItem>
+                    <ListItemIcon>
+                        <IconButton onClick={() => setNewEntryDialogOpen(true)}>
+                            <AddIcon />
+                        </IconButton>
+                    </ListItemIcon>
+                </ListItem>
+            </List>
             <NewEntryDialog
                 open={newEntryDialogOpen}
                 onCancel={() => setNewEntryDialogOpen(false)}
@@ -203,9 +201,6 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
                     router.refresh()
                 }}
             />
-            <IconButton onClick={() => setNewEntryDialogOpen(true)}>
-                <AddIcon />
-            </IconButton>
         </Paper>
 
     )
