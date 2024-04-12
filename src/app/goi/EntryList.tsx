@@ -6,13 +6,13 @@ import { addEntry, deleteEntry, updateEntry } from './actions'
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from '@mui/icons-material/EditOutlined';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -43,12 +43,12 @@ function EntryItem({ goiEntry, onDelete, onEdit, order }: {
     return (
         <ListItem component={Reorder.Item} value={order} dragListener={false}>
             <ListItemIcon onClick={onDelete}>
-                <IconButton >
+                <IconButton color="primary" size="small">
                     <DeleteIcon />
                 </IconButton>
             </ListItemIcon>
             <ListItemIcon onClick={onEdit}>
-                <IconButton >
+                <IconButton color="primary" size="small">
                     <EditIcon />
                 </IconButton>
             </ListItemIcon>
@@ -74,7 +74,7 @@ function NewEntryItem({ onAdd, order }: {
     return (
         <ListItem component={Reorder.Item} value={order} >
             <ListItemIcon>
-                <IconButton onClick={onAdd}>
+                <IconButton color="primary" size="small" onClick={onAdd}>
                     <AddIcon />
                 </IconButton>
             </ListItemIcon>
