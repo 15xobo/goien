@@ -135,6 +135,30 @@ function EditEntryDialog(
     )
 }
 
+function DeleteEntryDialog(
+    { entry, open, onCancel, onConfirm }: {
+        entry: GoiEntryData | null,
+        open: boolean,
+        onCancel: () => void,
+        onConfirm: () => void,
+    }
+) {
+    return (
+        <Dialog open={open}>
+            <DialogTitle>{`Delete sentence "${entry?.sentence}"`}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onCancel}>Cancel</Button>
+                <Button onClick={onConfirm}>Confirm</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
 export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
     const [editing, setEditing] = useState(false)
     const [entryIndex, setEntryIndex] = useState<number>(-1)
@@ -178,26 +202,16 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 </Reorder.Group>
 
             </List>
-            <Dialog open={!editing && entryIndex >= 0}>
-                <DialogTitle>Delete sentence</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {entryIndex >= 0 ? goiEntries[entryIndex].sentence : null}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEntryIndex(-1)}>Cancel</Button>
-                    <Button
-                        onClick={() => {
-                            deleteEntry(goi.id!, entryIndex)
-                            setEntryIndex(-1)
-                            router.refresh()
-                        }}
-                    >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteEntryDialog
+                open={!editing && entryIndex >= 0}
+                entry={entryIndex >= 0 ? goiEntries[entryIndex] : null}
+                onCancel={() => setEntryIndex(-1)}
+                onConfirm={() => {
+                    deleteEntry(goi.id!, entryIndex)
+                    setEntryIndex(-1)
+                    router.refresh()
+                }}
+            />
             <EditEntryDialog
                 open={editing}
                 entry={entry}
