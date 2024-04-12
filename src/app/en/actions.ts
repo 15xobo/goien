@@ -22,3 +22,7 @@ export async function udpateEn(en: En) {
 export async function deleteEn(id: string) {
     return enClient.deleteEn(id)
 }
+
+export async function attachGoi(id: string, goiId: string) {
+    await enClient.attachGoi(id, goiId)
+}

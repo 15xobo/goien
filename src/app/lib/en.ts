@@ -33,6 +33,10 @@ const enClient = function () {
         deleteEn: async function (id: string): Promise<void> {
             await ens_collection.deleteOne({ id: id })
         },
+
+        attachGoi: async function (id: string, goiId: string) {
+            await ens_collection.updateOne({ id: id }, { $addToSet: { 'goi_ids': goiId } })
+        },
     }
 }()
 

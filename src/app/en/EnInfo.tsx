@@ -1,9 +1,11 @@
 'use client'
 
 import { En as EnData, Goi as GoiData } from "../lib/model"
-import { deleteEn, udpateEn } from './actions'
+import { attachGoi, deleteEn, udpateEn } from './actions'
+import { getGoi, listGois } from '../goi/actions';
 import { useEffect, useState } from 'react'
 
+import AddIcon from '@mui/icons-material/AddCircle';
 import Button from '@mui/material/Button'
 import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog'
@@ -16,10 +18,12 @@ import Link from "next/link"
 import LinkIcon from '@mui/icons-material/Link';
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem';
+import  ListItemIcon from "@mui/material/ListItemIcon";
+import MenuItem from '@mui/material/MenuItem'
 import Paper from "@mui/material/Paper"
+import Select from "@mui/material/Select";
 import TextField from '@mui/material/TextField'
 import Typography from "@mui/material/Typography"
-import { getGoi } from '../goi/actions';
 import { useRouter } from 'next/navigation'
 
 function EditEnDialog({ open, enName, onChange, onConfirm, onCancel }: {
@@ -52,12 +56,54 @@ function EditEnDialog({ open, enName, onChange, onConfirm, onCancel }: {
     )
 }
 
+function AddGoiDialog({ open, selectedGoiId, onSelect, onCancel }: {
+    open: boolean,
+    selectedGoiId: string,
+    onSelect: (name: string) => void,
+    onCancel: () => void,
+}) {
+    const [gois, setGois] = useState<Array<GoiData>>([])
+
+    useEffect(() => {
+        if (open) {
+            listGois().then(setGois)
+        }
+    }, [open])
+
+    return (
+        <Dialog open={open} >
+            <DialogTitle>
+                Add words to the collection
+            </DialogTitle>
+            <DialogContent>
+                <Select
+                    value={selectedGoiId}
+                    onChange={(event) => onSelect(event.target.value)}
+                >
+                    {gois.map((goi) => (
+                        <MenuItem key={goi.id} value={goi.id}>
+                            {goi.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onCancel} color="primary" >
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
 export default function EnInfo(
     { en, deletable, }: { en: EnData, deletable: boolean, }
 ) {
     const [editing, setEditing] = useState(false)
     const [newName, setNewName] = useState(en.name)
     const [gois, setGois] = useState<Array<GoiData>>(new Array(en.goiIds.length))
+    const [addGoiDialogOpen, setAddGoiDialogOpen] = useState(false)
+    const [goiIdToAdd, setGoiIdToAdd] = useState('')
     const router = useRouter()
 
     useEffect(() => {
@@ -101,6 +147,20 @@ export default function EnInfo(
                     setNewName(en.name)
                 }}
             />
+            <AddGoiDialog
+                open={addGoiDialogOpen}
+                selectedGoiId={goiIdToAdd}
+                onSelect={(goiId) => {
+                    attachGoi(en.id, goiId)
+                    setAddGoiDialogOpen(false)
+                    setGoiIdToAdd('')
+                    router.refresh()
+                }}
+                onCancel={() => {
+                    setAddGoiDialogOpen(false)
+                    setGoiIdToAdd('')
+                }}
+            />
             <List>
                 {en.goiIds.map((goiId, index) => (
                     gois[index] &&
@@ -111,6 +171,11 @@ export default function EnInfo(
                         </Link>
                     </ListItem>
                 ))}
+                <ListItem>
+                    <ListItemIcon onClick={() => setAddGoiDialogOpen(true)}>
+                        <AddIcon color='primary'/>
+                    </ListItemIcon>
+                </ListItem>
             </List>
         </Paper >
     )
