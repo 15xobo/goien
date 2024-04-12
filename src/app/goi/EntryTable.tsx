@@ -18,14 +18,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper'
+import { Reorder } from "framer-motion"
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-function EntryRow({ goiEntry, onDelete }: {
+function EntryRow({ goiEntry, onDelete, index }: {
     goiEntry: GoiEntryData,
     onDelete: () => void,
+    index: number,
 }) {
     const sentence = goiEntry.sentence
     const parts = []
@@ -38,7 +40,7 @@ function EntryRow({ goiEntry, onDelete }: {
     parts.push([lastWordEnd, sentence.length])
 
     return (
-        <ListItem>
+        <ListItem component={Reorder.Item} value={index} dragListener={false}>
             <ListItemIcon onClick={onDelete}>
                 <IconButton >
                     <DeleteIcon />
@@ -135,7 +137,11 @@ function NewEntryDialog(
 export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
     const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
     const [entryIndex, setEntryIndex] = useState<number>(-1)
+    const [newEntryPosition, setNewEntryPosition] = useState(goiEntries.length)
     const router = useRouter()
+
+    const reorderedIndexes = Array.from(Array(goiEntries.length).keys())
+    reorderedIndexes.splice(newEntryPosition, 0, goiEntries.length)
 
     function handleDeleteEntry() {
         if (goi.type == GoiType.Article) {
@@ -150,22 +156,30 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
     return (
         <Paper >
             <List>
-                {
-                    goiEntries.map((entry, index) =>
-                        <EntryRow
-                            key={index}
-                            goiEntry={entry}
-                            onDelete={() => setEntryIndex(index)}
-                        />
-                    )
-                }
-                <ListItem>
-                    <ListItemIcon>
-                        <IconButton onClick={() => setNewEntryDialogOpen(true)}>
-                            <AddIcon />
-                        </IconButton>
-                    </ListItemIcon>
-                </ListItem>
+                <Reorder.Group axis="y" values={reorderedIndexes} onReorder={(indexes) => {
+                    setNewEntryPosition(indexes.indexOf(goiEntries.length))
+                }}>
+                    {reorderedIndexes.map((index) => (
+                        index == goiEntries.length ? (
+                            <ListItem key={index} component={Reorder.Item} value={index} >
+                                <ListItemIcon>
+                                    <IconButton onClick={() => setNewEntryDialogOpen(true)}>
+                                        <AddIcon />
+                                    </IconButton>
+                                </ListItemIcon>
+                            </ListItem>
+
+                        ) : (
+                            <EntryRow
+                                key={index}
+                                goiEntry={goiEntries[index]}
+                                onDelete={() => setEntryIndex(index)}
+                                index={index}
+                            />
+                        )
+                    ))}
+                </Reorder.Group>
+
             </List>
             <Dialog open={entryIndex >= 0}>
                 <DialogTitle>Delete sentence</DialogTitle>
@@ -185,6 +199,7 @@ export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntri
                 onConfirm={(entry) => {
                     addEntry(goi.id!, entry)
                     setNewEntryDialogOpen(false)
+                    setNewEntryPosition(newEntryPosition + 1)
                     router.refresh()
                 }}
             />
