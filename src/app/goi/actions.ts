@@ -4,6 +4,10 @@ import { Goi, GoiEntry } from "../lib/model";
 
 import { goiClient } from "../lib/goi";
 
+export async function getGoi(id: string) {
+    return goiClient.getGoi(id)
+}
+
 export async function addGoi(goi: Goi) {
     return goiClient.addGoi(goi)
 }

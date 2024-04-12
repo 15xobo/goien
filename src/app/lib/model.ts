@@ -23,4 +23,5 @@ export interface EnEntry {
 export interface En {
     id: string;
     name: string;
+    goiIds: Array<string> 
 }

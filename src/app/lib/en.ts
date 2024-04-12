@@ -10,7 +10,7 @@ const enClient = function () {
     return {
         listEns: async function (): Promise<Array<En>> {
             const goi_docs = await ens_collection.find({}).toArray()
-            return goi_docs.map(doc => ({ id: doc.id, name: doc.name }))
+            return goi_docs.map(doc => ({ id: doc.id, name: doc.name, goiIds: doc.goi_ids }))
         },
 
         getEn: async function (id: string): Promise<En> {
@@ -18,12 +18,12 @@ const enClient = function () {
             if (!en_doc) {
                 throw `goi ${id} is not found`
             }
-            return { id: en_doc.id, name: en_doc.name }
+            return { id: en_doc.id, name: en_doc.name, goiIds: en_doc.goi_ids }
         },
 
         addEn: async function (en: En): Promise<void> {
             const id = randomUUID()
-            await ens_collection.insertOne({ ...en, id: id })
+            await ens_collection.insertOne({ id: id, name: en.name, goi_ids: en.goiIds })
         },
 
         updateEn: async function (en: En): Promise<void> {

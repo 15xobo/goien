@@ -21,7 +21,7 @@ function NewEnDialog({ open, onClose }: {
     onClose: () => void,
 }) {
     const router = useRouter()
-    const [en, setEn] = useState<EnData>({id: 'placeholder', name: ''})
+    const [en, setEn] = useState<EnData>({id: 'placeholder', name: '', goiIds: []})
 
     function reset() {
         setEn({...en, name: ''})

@@ -1,6 +1,8 @@
 'use client'
 
+import { En as EnData, Goi as GoiData } from "../lib/model"
 import { deleteEn, udpateEn } from './actions'
+import { useEffect, useState } from 'react'
 
 import Button from '@mui/material/Button'
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,13 +11,16 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import EditIcon from '@mui/icons-material/Edit';
-import { En as EnData } from "../lib/model"
 import IconButton from '@mui/material/IconButton'
+import Link from "next/link"
+import LinkIcon from '@mui/icons-material/Link';
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem';
 import Paper from "@mui/material/Paper"
-import { TextField } from '@mui/material';
+import TextField from '@mui/material/TextField'
 import Typography from "@mui/material/Typography"
+import { getGoi } from '../goi/actions';
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 function EditEnDialog({ open, enName, onChange, onConfirm, onCancel }: {
     open: boolean,
@@ -52,7 +57,16 @@ export default function EnInfo(
 ) {
     const [editing, setEditing] = useState(false)
     const [newName, setNewName] = useState(en.name)
+    const [gois, setGois] = useState<Array<GoiData>>(new Array(en.goiIds.length))
     const router = useRouter()
+
+    useEffect(() => {
+        en.goiIds.forEach((id, index) => {
+            getGoi(id).then(goi => {
+                setGois(gois => en.goiIds.map((id, i) => i == index ? goi : gois[i]))
+            })
+        })
+    }, [en])
 
     return (
         <Paper>
@@ -87,6 +101,17 @@ export default function EnInfo(
                     setNewName(en.name)
                 }}
             />
+            <List>
+                {en.goiIds.map((goiId, index) => (
+                    gois[index] &&
+                    <ListItem key={goiId}>
+                        {gois[index]?.name}
+                        <Link href={`/goi/${goiId}`}>
+                            <LinkIcon />
+                        </Link>
+                    </ListItem>
+                ))}
+            </List>
         </Paper >
     )
 }
