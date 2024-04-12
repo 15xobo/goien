@@ -8,6 +8,7 @@ const goiClient = function () {
     const database = client.db('goien')
     const gois_collection = database.collection("gois")
     const goi_entires_collection = database.collection("goi_entries")
+    const articles_collection = database.collection("articles")
 
     return {
         listGois: async function (): Promise<Array<Goi>> {
@@ -32,6 +33,10 @@ const goiClient = function () {
         },
 
         listEntries: async function (goiId: string): Promise<Array<GoiEntry>> {
+            const article_doc = await articles_collection.findOne({ goi_id: goiId })
+            if (article_doc != null) {
+                return article_doc.entries
+            }
             const goi_entry_docs = await goi_entires_collection.find({ goi_id: goiId }).toArray()
             return goi_entry_docs.map(doc => { return { id: doc._id.toString(), sentence: doc.sentence, words: doc.words || [[doc.wordStart, doc.wordEnd]] } })
         },
@@ -41,11 +46,20 @@ const goiClient = function () {
             if (!goi_doc) {
                 throw `goi ${goiId} is not found`
             }
+            if (goi_doc.type == GoiType.Article) {
+                await articles_collection.updateOne({goi_id: goiId}, {$push: {entries: goiEntry}})
+                return
+            }
             await goi_entires_collection.insertOne({ goi_id: goiId, ...goiEntry })
         },
 
         deleteEntry: async function (goiEntryId: string) {
             goi_entires_collection.deleteOne({ _id: new ObjectId(goiEntryId) })
+        },
+
+        deleteArticleEntry: async function (goiId: string, entryIndex: number) {
+            await articles_collection.updateOne({ goi_id: goiId }, { $unset: { [`entries.${entryIndex}`]: null } })
+            await articles_collection.updateOne({ goi_id: goiId }, { $pull: { entries: null } })
         },
     }
 }()

@@ -11,7 +11,7 @@ export default async function GoiEntries({ params }: { params: { id: string } })
     return (
         <Box sx={{ width: '100%' }}>
             <GoiInfo goi={goi} deletable={goiEntries.length === 0} />
-            <EntryTable goiId={goiId} goiEntries={goiEntries} />
+            <EntryTable goi={goi} goiEntries={goiEntries} />
         </Box>
     )
 }

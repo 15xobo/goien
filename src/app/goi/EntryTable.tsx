@@ -1,6 +1,7 @@
 'use client'
 
-import { addEntry, deleteEntry } from './actions'
+import { Goi as GoiData, GoiEntry as GoiEntryData, GoiType } from "../lib/model";
+import { addEntry, deleteArticleEntry, deleteEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button'
@@ -11,7 +12,6 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import { GoiEntry as GoiEntryData } from "../lib/model";
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -175,7 +175,7 @@ function NewEntryDialog(
     )
 }
 
-export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEntries: Array<GoiEntryData> }) {
+export default function EntryTable({ goi, goiEntries }: { goi: GoiData, goiEntries: Array<GoiEntryData> }) {
     const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false)
     const router = useRouter()
 
@@ -184,9 +184,13 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
             <List>
                 <EntryRows
                     goiEntries={goiEntries}
-                    onDeleteEntry={entryIndex =>
-                        deleteEntry(goiEntries[entryIndex].id!)
-                    }
+                    onDeleteEntry={entryIndex => {
+                        if (goi.type == GoiType.Article) {
+                            deleteArticleEntry(goi.id!, entryIndex)
+                        } else {
+                            deleteEntry(goiEntries[entryIndex].id!)
+                        }
+                    }}
                 />
                 <ListItem>
                     <ListItemIcon>
@@ -200,7 +204,7 @@ export default function EntryTable({ goiId, goiEntries }: { goiId: string, goiEn
                 open={newEntryDialogOpen}
                 onCancel={() => setNewEntryDialogOpen(false)}
                 onConfirm={(entry) => {
-                    addEntry(goiId, entry)
+                    addEntry(goi.id!, entry)
                     setNewEntryDialogOpen(false)
                     router.refresh()
                 }}
