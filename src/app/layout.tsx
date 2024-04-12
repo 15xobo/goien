@@ -25,7 +25,7 @@ export default function RootLayout({
           <Container maxWidth="md">
             <Toolbar>
               <Button><Link href="/goi/">Wordbook</Link></Button>
-              <Button><Link href="/en/テスト">Card</Link></Button>
+              <Button><Link href="/en/">Card</Link></Button>
             </Toolbar>
           </Container>
         </AppBar>

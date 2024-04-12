@@ -20,3 +20,7 @@ export interface EnEntry {
     goiEntry: GoiEntry;
 }
 
+export interface En {
+    id: string;
+    name: string;
+}
