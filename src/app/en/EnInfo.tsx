@@ -17,6 +17,36 @@ import Typography from "@mui/material/Typography"
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+function EditEnDialog({ open, enName, onChange, onConfirm, onCancel }: {
+    open: boolean,
+    enName: string,
+    onChange: (name: string) => void,
+    onConfirm: () => void,
+    onCancel: () => void,
+}) {
+    return (
+        <Dialog open={open} >
+            <DialogTitle>
+                Change name
+            </DialogTitle>
+            <DialogContent>
+                <TextField
+                    value={enName}
+                    onChange={(event) => onChange(event.target.value)}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onConfirm} color="primary">
+                    Confirm
+                </Button>
+                <Button onClick={onCancel} color="primary" >
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
 export default function EnInfo(
     { en, deletable, }: { en: EnData, deletable: boolean, }
 ) {
@@ -43,38 +73,20 @@ export default function EnInfo(
             >
                 <DeleteIcon />
             </IconButton>
-            <Dialog open={editing} >
-                <DialogTitle>
-                    Change name
-                </DialogTitle>
-                <DialogContent>
-                    <TextField
-                        value={newName}
-                        onChange={(event) => setNewName(event.target.value)}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {
-                            udpateEn({ ...en, name: newName })
-                            setEditing(false)
-                            router.refresh()
-                        }}
-                        color="primary"
-                    >
-                        Confirm
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setEditing(false)
-                            setNewName(en.name)
-                        }}
-                        color="primary"
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <EditEnDialog
+                open={editing}
+                enName={newName}
+                onChange={(name) => setNewName(name)}
+                onConfirm={() => {
+                    udpateEn({ ...en, name: newName })
+                    setEditing(false)
+                    router.refresh()
+                }}
+                onCancel={() => {
+                    setEditing(false)
+                    setNewName(en.name)
+                }}
+            />
         </Paper >
     )
 }
