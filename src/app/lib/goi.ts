@@ -1,6 +1,6 @@
 import { Goi, GoiEntry, GoiType } from "./model";
-import { MongoClient, ObjectId } from "mongodb";
 
+import { MongoClient } from "mongodb";
 import { randomUUID } from "crypto";
 
 const goiClient = function () {
@@ -25,8 +25,8 @@ const goiClient = function () {
 
         addGoi: async function (goi: Goi): Promise<void> {
             const id = randomUUID()
-            await gois_collection.insertOne({ id: id, name: goi.name, type: goi.type })
-            await goi_entires_collection.insertOne({goi_id: id, entries: []})
+            await gois_collection.insertOne({ ...goi, id: id })
+            await goi_entires_collection.insertOne({ goi_id: id, entries: [] })
         },
 
         deleteGoi: async function (id: string): Promise<void> {
@@ -38,8 +38,8 @@ const goiClient = function () {
             return article_doc?.entries
         },
 
-        addEntry: async function (goiId: string, index: number, goiEntry: GoiEntry): Promise<void> {
-            await goi_entires_collection.updateOne({goi_id: goiId}, {$push: {entries: {$each: [goiEntry], $position: index}}})
+        addEntry: async function (goiId: string, entryIndex: number, entry: GoiEntry): Promise<void> {
+            await goi_entires_collection.updateOne({ goi_id: goiId }, { $push: { entries: { $each: [entry], $position: entryIndex } } })
         },
 
         updateEntry: async function (goiId: string, entryIndex: number, entry: GoiEntry) {

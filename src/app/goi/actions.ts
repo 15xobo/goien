@@ -12,8 +12,8 @@ export async function deleteGoi(id: string) {
     return goiClient.deleteGoi(id)
 }
 
-export async function addEntry(goiId: string, index: number, goiEntry: GoiEntry) {
-    return goiClient.addEntry(goiId, index, goiEntry)
+export async function addEntry(goiId: string, entryIndex: number, goiEntry: GoiEntry) {
+    return goiClient.addEntry(goiId, entryIndex, goiEntry)
 }
 
 export async function updateEntry (goiId: string, entryIndex: number, entry: GoiEntry) {

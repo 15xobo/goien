@@ -1,6 +1,6 @@
 
 export interface Goi {
-    id?: string;
+    id: string;
     name: string;
     type: GoiType;
 }
@@ -11,7 +11,6 @@ export enum GoiType {
 }
 
 export interface GoiEntry {
-    id?: string;
     sentence: string;
     words: Array<[number, number]>;
 }

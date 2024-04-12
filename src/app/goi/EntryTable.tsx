@@ -1,6 +1,6 @@
 'use client'
 
-import { Goi as GoiData, GoiEntry as GoiEntryData, GoiType } from "../lib/model";
+import { Goi as GoiData, GoiEntry as GoiEntryData } from "../lib/model";
 import { addEntry, deleteEntry, updateEntry } from './actions'
 
 import AddIcon from '@mui/icons-material/Add';

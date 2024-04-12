@@ -29,7 +29,7 @@ function NewGoiDialog({ open, onClose }: {
     onClose: () => void,
 }) {
     const router = useRouter()
-    const initGoi = () => { return { name: '', type: GoiType.Default }; }
+    const initGoi = () => { return { id: 'placeholder', name: '', type: GoiType.Default }; }
     const [goi, setGoi] = useState<GoiData>(initGoi())
 
     function reset() {
