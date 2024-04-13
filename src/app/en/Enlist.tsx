@@ -11,6 +11,7 @@ import Link from 'next/link';
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
+import PlayIcon from '@mui/icons-material/PlayCircle';
 import TextField from '@mui/material/TextField'
 import { addEn } from "./actions";
 import { useRouter } from 'next/navigation';
@@ -21,10 +22,10 @@ function NewEnDialog({ open, onClose }: {
     onClose: () => void,
 }) {
     const router = useRouter()
-    const [en, setEn] = useState<EnData>({id: 'placeholder', name: '', goiIds: []})
+    const [en, setEn] = useState<EnData>({ id: 'placeholder', name: '', goiIds: [] })
 
     function reset() {
-        setEn({...en, name: ''})
+        setEn({ ...en, name: '' })
         onClose()
     }
 
@@ -67,6 +68,11 @@ export default function EnList({ ens }: { ens: Array<EnData>, }) {
         <List>
             {ens.map(en => (
                 <ListItem key={en.id}>
+                    <ListItemButton>
+                        <Link href={`/en/${en.id}/run`}>
+                            <PlayIcon />
+                        </Link>
+                    </ListItemButton>
                     <ListItemButton>
                         <Link href={`/en/${en.id}`}>{en.name}</Link>
                     </ListItemButton>
