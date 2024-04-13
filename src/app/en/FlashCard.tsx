@@ -2,14 +2,14 @@
 
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
-import { EnEntry } from "../lib/model"
+import { EnRunEntry as EnRunEntryData } from "../lib/model"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
 
-export default function FlashCard({ enEntry }: { enEntry: EnEntry }) {
+export default function FlashCard({ runEntry }: { runEntry: EnRunEntryData }) {
     const [flipped, setFlipped] = useState(false)
 
-    const { sentence, wordStart, wordEnd } = enEntry.goiEntry
+    const { sentence, wordStart, wordEnd } = runEntry
     const firstPart = sentence.substring(0, wordStart)
     const wordPart = sentence.substring(wordStart, wordEnd)
     const lastPart = sentence.substring(wordEnd)

@@ -25,3 +25,9 @@ export interface En {
     name: string;
     goiIds: Array<string> 
 }
+
+export interface EnRunEntry {
+    sentence: string,
+    wordStart: number,
+    wordEnd: number,
+}
