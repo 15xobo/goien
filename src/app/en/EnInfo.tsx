@@ -6,21 +6,26 @@ import { getGoi, listGois } from '../goi/actions';
 import { useEffect, useState } from 'react'
 
 import AddIcon from '@mui/icons-material/AddCircle';
-import Button from '@mui/material/Button'
-import DeleteIcon from '@mui/icons-material/Delete';
+import Box from "@mui/material/Box";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import EditIcon from '@mui/icons-material/Edit';
+import Divider from "@mui/material/Divider";
+import EditIcon from '@mui/icons-material/EditOutlined';
+import FormControl from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
 import IconButton from '@mui/material/IconButton'
+import InputLabel from '@mui/material/InputLabel'
 import Link from "next/link"
-import LinkIcon from '@mui/icons-material/Link';
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import MenuItem from '@mui/material/MenuItem'
-import Paper from "@mui/material/Paper"
 import Select from "@mui/material/Select";
 import TextField from '@mui/material/TextField'
 import Typography from "@mui/material/Typography"
@@ -34,23 +39,31 @@ function EditEnDialog({ open, enName, onChange, onConfirm, onCancel }: {
     onCancel: () => void,
 }) {
     return (
-        <Dialog open={open} >
+        <Dialog open={open} PaperProps={{
+            component: 'form',
+            sx: { width: 360 },
+        }}>
             <DialogTitle>
-                Change name
+                Edit
             </DialogTitle>
-            <DialogContent>
+            <DialogContent dividers>
                 <TextField
+                    required
+                    label="Title"
+                    fullWidth
+                    variant="standard"
+                    focused
                     value={enName}
                     onChange={(event) => onChange(event.target.value)}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onConfirm} color="primary">
-                    Confirm
-                </Button>
-                <Button onClick={onCancel} color="primary" >
-                    Cancel
-                </Button>
+                <IconButton color='error' size="large" onClick={onCancel}>
+                    <ClearIcon />
+                </IconButton>
+                <IconButton color='success' size="large" onClick={onConfirm}>
+                    <CheckIcon />
+                </IconButton>
             </DialogActions>
         </Dialog>
     )
@@ -71,26 +84,36 @@ function AddGoiDialog({ open, selectedGoiId, onSelect, onCancel }: {
     }, [open])
 
     return (
-        <Dialog open={open} >
+        <Dialog open={open} PaperProps={{
+            component: 'form',
+            sx: { width: 360 },
+        }}>
             <DialogTitle>
-                Add words to the collection
+                Add
             </DialogTitle>
-            <DialogContent>
-                <Select
-                    value={selectedGoiId}
-                    onChange={(event) => onSelect(event.target.value)}
-                >
-                    {gois.map((goi) => (
-                        <MenuItem key={goi.id} value={goi.id}>
-                            {goi.name}
-                        </MenuItem>
-                    ))}
-                </Select>
+            <DialogContent dividers>
+                <FormControl required fullWidth variant='standard' focused>
+                    <InputLabel>Material</InputLabel>
+                    <Select
+                        value={selectedGoiId}
+                        onChange={(event) => onSelect(event.target.value)}
+                    >
+                        {gois.map((goi) => (
+                            <MenuItem key={goi.id} value={goi.id}>
+                                {goi.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText></FormHelperText>
+                </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel} color="primary" >
-                    Cancel
-                </Button>
+                <IconButton
+                    color='error'
+                    size="large"
+                    onClick={onCancel}>
+                    <ClearIcon />
+                </IconButton>
             </DialogActions>
         </Dialog>
     )
@@ -115,8 +138,8 @@ export default function EnInfo(
     }, [en])
 
     return (
-        <Paper>
-            <Typography variant='h2' display="inline">{en.name}</Typography>
+        <Box>
+            <Typography variant='h6' display="inline">{en.name}</Typography>
             <IconButton
                 color='primary'
                 onClick={() => setEditing(true)}
@@ -161,30 +184,34 @@ export default function EnInfo(
                     setGoiIdToAdd('')
                 }}
             />
+            <Divider />
             <List>
                 {en.goiIds.map((goiId, index) => (
                     gois[index] &&
                     <ListItem key={goiId}>
-                        <ListItemIcon
-                            onClick={() => {
+                        <ListItemIcon>
+                            <IconButton color="primary" onClick={() => {
                                 detachGoi(en.id, goiId)
                                 router.refresh()
-                            }}
-                        >
-                            <DeleteIcon color='primary' />
+                            }}>
+                                <DeleteIcon color='primary' />
+                            </IconButton>
                         </ListItemIcon>
-                        {gois[index]?.name}
-                        <Link href={`/goi/${goiId}`}>
-                            <LinkIcon />
-                        </Link>
+                        <ListItemText>
+                            <Link href={`/goi/${goiId}`}>
+                                {gois[index]?.name}
+                            </Link>
+                        </ListItemText>
                     </ListItem>
                 ))}
                 <ListItem>
-                    <ListItemIcon onClick={() => setAddGoiDialogOpen(true)}>
-                        <AddIcon color='primary' />
+                    <ListItemIcon >
+                        <IconButton color="primary" onClick={() => setAddGoiDialogOpen(true)}>
+                            <AddIcon />
+                        </IconButton>
                     </ListItemIcon>
                 </ListItem>
             </List>
-        </Paper >
+        </Box >
     )
 }

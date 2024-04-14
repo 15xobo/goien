@@ -1,4 +1,5 @@
 import EnInfo from "../EnInfo"
+import Stack from '@mui/system/Stack'
 import { getEn } from "../actions"
 
 export default async function EnEntries({ params }: { params: { id: string } }) {
@@ -6,6 +7,8 @@ export default async function EnEntries({ params }: { params: { id: string } }) 
     const en = await getEn(enId)
 
     return (
-        <EnInfo en={en} deletable/>
+        <Stack sx={{ width: '100%', mt: 2 }}>
+            <EnInfo en={en} deletable={en.goiIds.length == 0} />
+        </Stack>
     )
 }
