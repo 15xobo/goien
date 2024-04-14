@@ -13,29 +13,24 @@ export default function FlashCard({ runEntry }: { runEntry: EnRunEntryData }) {
     const firstPart = sentence.substring(0, wordStart)
     const wordPart = sentence.substring(wordStart, wordEnd)
     const lastPart = sentence.substring(wordEnd)
-    console.log(firstPart)
-    console.log(wordPart)
-    console.log(lastPart)
-
 
     function handleClick() {
         setFlipped(!flipped)
     }
 
     return (
-        <Card sx={{ blockSize: '600px', inlineSize: '400px', display: 'flex', alignItems: 'center' }} onClick={handleClick}>
-            {flipped ?
-                <CardContent sx={{ inlineSize: '100%', textAlign: 'center' }}>
-                    <Typography display='inline'>{firstPart}</Typography>
-                    <Typography display='inline' color='error' sx={{ textDecoration: 'underline' }}>{wordPart}</Typography>
-                    <Typography display='inline'>{lastPart}</Typography>
-                </CardContent> :
-                <CardContent sx={{ inlineSize: '100%', textAlign: 'center' }}>
-                    <Typography display='inline'>{firstPart}</Typography>
-                    <Typography display='inline' color='error' sx={{ whiteSpace: 'pre', textDecoration: 'underline' }}>{'    '.repeat(wordPart.length)}</Typography>
-                    <Typography display='inline'>{lastPart}</Typography>
-                </CardContent>
-            }
+        <Card sx={{ width: '100%', minHeight: 400, maxWidth: 400, mt: 1, mb: 1, display: 'flex', alignItems: 'center' }} onClick={handleClick}>
+            <CardContent sx={{ inlineSize: '100%', textAlign: 'center' }}>
+                <Typography display='inline'>{firstPart}</Typography>
+                <Typography
+                    display='inline'
+                    color={flipped ? 'red' : 'primary.contrastText'}
+                    sx={{ textDecoration: 'underline', textDecorationColor: 'red' }}
+                >
+                    {wordPart}
+                </Typography>
+                <Typography display='inline'>{lastPart}</Typography>
+            </CardContent>
         </Card>
     )
 }
