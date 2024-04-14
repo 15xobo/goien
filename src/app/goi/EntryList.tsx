@@ -6,7 +6,9 @@ import { addEntry, deleteEntry, updateEntry } from './actions'
 import AddIcon from '@mui/icons-material/AddCircle';
 import Button from '@mui/material/Button'
 import ButtonGroup from "@mui/material/ButtonGroup";
+import CheckIcon from '@mui/icons-material/Check';
 import Chip from '@mui/material/Chip';
+import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -123,13 +125,17 @@ function EditEntryDialog(
     }
 
     return (
-        <Dialog open={open} >
+        <Dialog open={open} PaperProps={{
+            component: 'form',
+            sx: { width: 360 },
+        }}>
             <DialogTitle>
-                {oldEntry ? `Edit sentence "${oldEntry.sentence}"` : 'Add sentence'}
+                {oldEntry ? 'Edit' : 'new'}
             </DialogTitle>
             <DialogContent>
                 <TextField
                     variant='standard'
+                    required
                     fullWidth
                     multiline
                     value={entry?.sentence}
@@ -147,12 +153,12 @@ function EditEntryDialog(
                 }
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>
-                    Cancel
-                </Button>
-                <Button disabled={entry == null} onClick={onConfirm}>
-                    Confirm
-                </Button>
+                <IconButton color='error' size="large" onClick={onCancel}>
+                    <ClearIcon />
+                </IconButton>
+                <IconButton color='success' size="large" onClick={onConfirm}>
+                    <CheckIcon />
+                </IconButton>
             </DialogActions>
         </Dialog>
     )
@@ -167,16 +173,22 @@ function DeleteEntryDialog(
     }
 ) {
     return (
-        <Dialog open={open}>
-            <DialogTitle>{`Delete sentence "${entry?.sentence}"`}</DialogTitle>
+        <Dialog open={open} PaperProps={{
+            sx: { width: 360 },
+        }}>
+            <DialogTitle>Delete</DialogTitle>
             <DialogContent>
-                <DialogContentText>
-
+                <DialogContentText sx={{ wordBreak: 'break-all' }}>
+                    {entry?.sentence}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
-                <Button onClick={onConfirm}>Confirm</Button>
+                <IconButton color='error' size="large" onClick={onCancel}>
+                    <ClearIcon />
+                </IconButton>
+                <IconButton color='success' size="large" onClick={onConfirm}>
+                    <CheckIcon />
+                </IconButton>
             </DialogActions>
         </Dialog>
     )
