@@ -18,11 +18,16 @@ export default function EnRun({ goiEntries }: { goiEntries: Array<GoiEntryData>,
     })
 
     const [currentIndex, setCurrentIndex] = useState(0)
+    const [cardFlipped, setCardFlipped] = useState(false)
 
     return (
         <Stack sx={{ width: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <FlashCard runEntry={entries[currentIndex]} />
+                <FlashCard
+                    runEntry={entries[currentIndex]}
+                    flipped={cardFlipped}
+                    onClick={() => setCardFlipped(!cardFlipped)}
+                />
             </Box>
             <MobileStepper
                 steps={entries.length}
@@ -33,7 +38,10 @@ export default function EnRun({ goiEntries }: { goiEntries: Array<GoiEntryData>,
                     <IconButton
                         disabled={currentIndex == 0}
                         color="primary"
-                        onClick={() => setCurrentIndex(currentIndex - 1)}
+                        onClick={() => {
+                            setCardFlipped(false)
+                            setCurrentIndex(currentIndex - 1)
+                        }}
                     >
                         <ArrowBackIosIcon />
                     </IconButton>
@@ -42,7 +50,10 @@ export default function EnRun({ goiEntries }: { goiEntries: Array<GoiEntryData>,
                     <IconButton
                         disabled={currentIndex + 1 == goiEntries.length}
                         color="primary"
-                        onClick={() => setCurrentIndex(currentIndex + 1)}
+                        onClick={() => {
+                            setCardFlipped(false)
+                            setCurrentIndex(currentIndex + 1)
+                        }}
                     >
                         <ArrowForwardIosIcon />
                     </IconButton>
