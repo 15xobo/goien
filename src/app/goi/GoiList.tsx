@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogActions, DialogTitle } from "@mui/material";
 import { Goi as GoiData, GoiType } from "../lib/model";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
@@ -15,6 +16,7 @@ import Link from 'next/link';
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from '@mui/material/TextField'
 import { addGoi } from './actions';
@@ -39,21 +41,27 @@ function NewGoiDialog({ open, onClose }: {
     }
 
     return (
-        <Dialog open={open} PaperProps={{
-            component: 'form',
-        }}>
-            <DialogContent>
+        <Dialog open={open}
+            PaperProps={{
+                component: 'form',
+                sx: {width: 360}
+            }}>
+            <DialogTitle>
+                New
+            </DialogTitle>
+            <DialogContent dividers>
                 <TextField
                     autoFocus
                     required
-                    label="Goi Name"
+                    label="Title"
                     fullWidth
                     variant="standard"
+                    focused
                     value={goi.name}
                     onChange={(event) => setGoi({ ...goi, name: event.target.value })}
                     sx={{ mb: 3 }}
                 />
-                <FormControl fullWidth>
+                <FormControl variant='standard'>
                     <InputLabel>Type</InputLabel>
                     <Select
                         value={goi.type}
@@ -64,8 +72,17 @@ function NewGoiDialog({ open, onClose }: {
                         <MenuItem value={GoiType.Article}>Article</MenuItem>
                     </Select>
                 </FormControl>
+            </DialogContent>
+            <DialogActions>
+                <IconButton
+                    color='error'
+                    size="large"
+                    onClick={reset}>
+                    <ClearIcon />
+                </IconButton>
                 <IconButton
                     color='success'
+                    size="large"
                     disabled={goi.name.length === 0}
                     onClick={() => {
                         addGoi(goi!)
@@ -75,10 +92,7 @@ function NewGoiDialog({ open, onClose }: {
                 >
                     <CheckIcon />
                 </IconButton>
-                <IconButton color='error' onClick={reset}>
-                    <ClearIcon />
-                </IconButton>
-            </DialogContent>
+            </DialogActions>
         </Dialog >
     )
 }
@@ -87,19 +101,19 @@ export default function GoiList({ gois }: { gois: Array<GoiData>, }) {
     const [newGoiDialogOpen, setNewGoiDialogOpen] = useState(false)
 
     return (
-        <List>
+        <List dense sx={{ width: '100%', maxWidth: 400 }}>
             {gois.map(goi => (
-                <ListItem key={goi.id}>
-                    <ListItemButton>
-                        <Link href={`/goi/${goi.id}`}>{goi.name}</Link>
+                <ListItem key={goi.id} divider>
+                    <ListItemButton LinkComponent={Link} href={`/goi/${goi.id}`}>
+                        <ListItemText primary={goi.name} />
                     </ListItemButton>
                 </ListItem>
-            )
-            )}
+            ))}
             <ListItem>
                 <ListItemButton onClick={() => setNewGoiDialogOpen(true)}>
                     <AddIcon />
                 </ListItemButton>
+
             </ListItem>
             <NewGoiDialog open={newGoiDialogOpen} onClose={() => setNewGoiDialogOpen(false)} />
         </List>
