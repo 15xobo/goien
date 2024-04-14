@@ -1,6 +1,7 @@
-import Box from '@mui/system/Box'
+import  Divider from '@mui/material/Divider'
 import EntryList from '@/app/goi/EntryList'
 import GoiInfo from '@/app/goi/GoiInfo'
+import Stack from '@mui/system/Stack'
 import { goiClient } from '@/app/lib/goi'
 
 export default async function GoiEntries({ params }: { params: { id: string } }) {
@@ -9,9 +10,10 @@ export default async function GoiEntries({ params }: { params: { id: string } })
     const goi = await goiClient.getGoi(goiId)
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Stack sx={{ width: '100%', mt: 2}}>
             <GoiInfo goi={goi} deletable={goiEntries.length === 0} />
+            <Divider/>
             <EntryList goi={goi} goiEntries={goiEntries} />
-        </Box>
+        </Stack>
     )
 }
