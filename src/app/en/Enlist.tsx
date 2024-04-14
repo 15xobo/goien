@@ -4,7 +4,9 @@ import AddIcon from '@mui/icons-material/AddCircle';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle';
 import { En as EnData } from "../lib/model";
 import IconButton from '@mui/material/IconButton';
 import Link from 'next/link';
@@ -32,16 +34,28 @@ function NewEnDialog({ open, onClose }: {
     return (
         <Dialog open={open} PaperProps={{
             component: 'form',
+            sx: { width: 360 }
         }}>
-            <DialogContent>
+            <DialogTitle>
+                New
+            </DialogTitle>
+            <DialogContent dividers>
                 <TextField
                     autoFocus
                     required
+                    label="Title"
                     fullWidth
                     variant="standard"
+                    focused
                     value={en.name}
                     onChange={(event) => setEn({ ...en, name: event.target.value })}
                 />
+
+            </DialogContent>
+            <DialogActions>
+                <IconButton color='error' onClick={reset}>
+                    <ClearIcon />
+                </IconButton>
                 <IconButton
                     color='success'
                     disabled={en.name.length === 0}
@@ -53,10 +67,7 @@ function NewEnDialog({ open, onClose }: {
                 >
                     <CheckIcon />
                 </IconButton>
-                <IconButton color='error' onClick={reset}>
-                    <ClearIcon />
-                </IconButton>
-            </DialogContent>
+            </DialogActions>
         </Dialog >
     )
 }
@@ -65,16 +76,15 @@ export default function EnList({ ens }: { ens: Array<EnData>, }) {
     const [newEnDialogOpen, setNewEnDialogOpen] = useState(false)
 
     return (
-        <List>
+        <List dense sx={{ width: '100%', maxWidth: 400 }}>
             {ens.map(en => (
-                <ListItem key={en.id}>
-                    <ListItemButton>
-                        <Link href={`/en/${en.id}/run`}>
-                            <PlayIcon />
-                        </Link>
-                    </ListItemButton>
-                    <ListItemButton>
-                        <Link href={`/en/${en.id}`}>{en.name}</Link>
+                <ListItem key={en.id} divider secondaryAction={
+                    <IconButton color='primary' LinkComponent={Link} href={`/en/${en.id}/run`}>
+                        <PlayIcon />
+                    </IconButton>
+                }>
+                    <ListItemButton LinkComponent={Link} href={`/en/${en.id}`}>
+                        {en.name}
                     </ListItemButton>
                 </ListItem>
             ))}
