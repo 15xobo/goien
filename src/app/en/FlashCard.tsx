@@ -1,7 +1,11 @@
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
+
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import { EnRunEntry as EnRunEntryData } from "../lib/model"
 import Typography from "@mui/material/Typography"
+
+const theme = responsiveFontSizes(createTheme());
 
 export default function FlashCard({ runEntry, flipped, onClick }: {
     runEntry: EnRunEntryData,
@@ -19,15 +23,18 @@ export default function FlashCard({ runEntry, flipped, onClick }: {
             sx={{ width: '100%', minHeight: 400, maxWidth: 400, mt: 1, mb: 1, display: 'flex', alignItems: 'center' }}
         >
             <CardContent sx={{ inlineSize: '100%', textAlign: 'center' }}>
-                <Typography display='inline'>{firstPart}</Typography>
+                <ThemeProvider theme={theme}>
+                <Typography variant="h4" display='inline'>{firstPart}</Typography>
                 <Typography
+                    variant="h4"
                     display='inline'
                     color={flipped ? 'red' : 'primary.contrastText'}
                     sx={{ textDecoration: 'underline', textDecorationColor: 'red' }}
                 >
                     {wordPart}
                 </Typography>
-                <Typography display='inline'>{lastPart}</Typography>
+                <Typography variant="h4" display='inline'>{lastPart}</Typography>
+                </ThemeProvider>
             </CardContent>
         </Card>
     )
