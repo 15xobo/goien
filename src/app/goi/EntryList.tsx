@@ -3,8 +3,9 @@
 import { Goi as GoiData, GoiEntry as GoiEntryData } from "../lib/model";
 import { addEntry, deleteEntry, updateEntry } from './actions'
 
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from '@mui/icons-material/AddCircle';
 import Button from '@mui/material/Button'
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Chip from '@mui/material/Chip';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Dialog from '@mui/material/Dialog'
@@ -31,7 +32,7 @@ function EntryItem({ goiEntry, onDelete, onEdit, order }: {
     order: number,
 }) {
     const sentence = goiEntry.sentence
-    const parts = []
+    const parts: Array<[number, number]> = []
     let lastWordEnd = 0
     for (let i = 0; i < goiEntry.words.length; ++i) {
         parts.push([lastWordEnd, goiEntry.words[i][0]])
@@ -41,28 +42,33 @@ function EntryItem({ goiEntry, onDelete, onEdit, order }: {
     parts.push([lastWordEnd, sentence.length])
 
     return (
-        <ListItem component={Reorder.Item} value={order} dragListener={false}>
-            <ListItemIcon onClick={onDelete}>
-                <IconButton color="primary" size="small">
-                    <DeleteIcon />
-                </IconButton>
-            </ListItemIcon>
-            <ListItemIcon onClick={onEdit}>
-                <IconButton color="primary" size="small">
+        <ListItem
+            disableGutters
+            component={Reorder.Item}
+            value={order}
+            dragListener={false}
+            secondaryAction={
+                <ButtonGroup>
+                    <IconButton color="primary" onClick={onDelete}>
+                        <DeleteIcon />
+                    </IconButton>
+                </ButtonGroup>
+            }
+        >
+            <ListItemIcon>
+                <IconButton color="primary" onClick={onEdit}>
                     <EditIcon />
                 </IconButton>
             </ListItemIcon>
-            <ListItemText >
-                {
-                    parts.map(([wordStart, wordEnd], index) => index % 2 ?
-                        <Typography key={index} display="inline" color={'error'} sx={{ border: 'thin solid' }}>
-                            {sentence.substring(wordStart, wordEnd)}
-                        </Typography> :
-                        <Typography key={index} display="inline">
-                            {sentence.substring(wordStart, wordEnd)}
-                        </Typography>)
-                }
-            </ListItemText>
+            <ListItemText primary={
+                parts.map(([wordStart, wordEnd], index) => index % 2 ?
+                    <Typography key={index} display="inline" color={'error'} sx={{ border: 'thin solid' }}>
+                        {sentence.substring(wordStart, wordEnd)}
+                    </Typography> :
+                    <Typography key={index} display="inline">
+                        {sentence.substring(wordStart, wordEnd)}
+                    </Typography>)
+            } />
         </ListItem>
     )
 }
@@ -72,13 +78,17 @@ function NewEntryItem({ onAdd, order }: {
     order: number,
 }) {
     return (
-        <ListItem component={Reorder.Item} value={order} >
+        <ListItem
+            disableGutters
+            component={Reorder.Item}
+            value={order}
+        >
             <ListItemIcon>
-                <IconButton color="primary" size="small" onClick={onAdd}>
+                <IconButton color="primary" onClick={onAdd}>
                     <AddIcon />
                 </IconButton>
             </ListItemIcon>
-        </ListItem>
+        </ ListItem>
     )
 }
 function EditEntryDialog(
@@ -190,6 +200,7 @@ export default function EntryList({ goi, goiEntries }: { goi: GoiData, goiEntrie
             onReorder={(indexes) => {
                 setInsertPosition(indexes.indexOf(goiEntries.length))
             }}
+            sx={{ wordBreak: 'break-all' }}
         >
             {reorderedIndexes.map((index) => (
                 index == goiEntries.length ? (
