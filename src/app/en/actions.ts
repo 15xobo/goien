@@ -14,7 +14,7 @@ export async function listEns() {
     return goi_docs.map(doc => ({ id: doc.id, name: doc.name, goiIds: doc.goi_ids }));
 }
 
-export async function getEn(id: string) {
+export async function getEn(id: string): Promise<En> {
     const database = getDatabase();
     const en_doc = await database.collection("ens").findOne({ id: id })
     if (!en_doc) {

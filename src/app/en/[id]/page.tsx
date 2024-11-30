@@ -2,9 +2,8 @@ import EnInfo from "../EnInfo"
 import Stack from '@mui/system/Stack'
 import { getEn } from "../actions"
 
-export default async function EnEntries({ params }: { params: { id: string } }) {
-    const { id } = await params;
-    const enId = decodeURIComponent(id)
+export default async function EnEntries({ params }: { params: Promise<{ id: string }> }) {
+    const enId = decodeURIComponent((await params).id)
     const en = await getEn(enId)
 
     return (
