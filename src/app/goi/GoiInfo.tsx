@@ -37,8 +37,8 @@ export default function GoiInfo(
             <IconButton
                 disabled={!deletable}
                 color='primary'
-                onClick={() => {
-                    deleteGoi(goi.id!)
+                onClick={async () => {
+                    await deleteGoi(goi.id!)
                     router.push('/goi/')
                 }}
             >
@@ -75,8 +75,8 @@ export default function GoiInfo(
                         color='success'
                         size="large"
                         disabled={goi.name.length === 0}
-                        onClick={() => {
-                            updateGoi({ ...goi, name: newName })
+                        onClick={async () => {
+                            await updateGoi({ ...goi, name: newName })
                             setEditing(false)
                             router.refresh()
                         }}

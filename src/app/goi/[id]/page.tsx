@@ -1,13 +1,15 @@
+import { getGoi, listEntries } from '../actions'
+
 import  Divider from '@mui/material/Divider'
 import EntryList from '@/app/goi/EntryList'
 import GoiInfo from '@/app/goi/GoiInfo'
 import Stack from '@mui/system/Stack'
-import { goiClient } from '@/app/lib/goi'
 
 export default async function GoiEntries({ params }: { params: { id: string } }) {
-    const goiId = decodeURIComponent(params.id)
-    const goiEntries = await goiClient.listEntries(goiId)
-    const goi = await goiClient.getGoi(goiId)
+    const { id } = await params;
+    const goiId = decodeURIComponent(id)
+    const goiEntries = await listEntries(goiId)
+    const goi = await getGoi(goiId)
 
     return (
         <Stack sx={{ width: '100%', mt: 2}}>

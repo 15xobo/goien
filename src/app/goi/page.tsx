@@ -1,8 +1,8 @@
 import GoiList from './GoiList';
-import { goiClient } from '@/app/lib/goi'
+import { listGois } from './actions'
 
 export default async function Gois() {
-    const gois = await goiClient.listGois()
+    const gois = await listGois();
 
     return (
         <GoiList gois={gois} />

@@ -239,8 +239,8 @@ export default function EntryList({ goi, goiEntries }: { goi: GoiData, goiEntrie
                 open={!editing && modifyPosition >= 0}
                 entry={modifyPosition >= 0 ? goiEntries[modifyPosition] : null}
                 onCancel={() => setModifyPosition(-1)}
-                onConfirm={() => {
-                    deleteEntry(goi.id!, modifyPosition)
+                onConfirm={async () => {
+                    await deleteEntry(goi.id!, modifyPosition)
                     setModifyPosition(-1)
                     router.refresh()
                 }}
@@ -255,11 +255,11 @@ export default function EntryList({ goi, goiEntries }: { goi: GoiData, goiEntrie
                     setEditing(false)
                     setModifyPosition(-1)
                 }}
-                onConfirm={() => {
+                onConfirm={async () => {
                     if (modifyPosition >= 0) {
-                        updateEntry(goi.id!, modifyPosition, entry!)
+                        await updateEntry(goi.id!, modifyPosition, entry!)
                     } else {
-                        addEntry(goi.id!, insertPosition, entry!)
+                        await addEntry(goi.id!, insertPosition, entry!)
                     }
                     setEntry(null)
                     setEditing(false)

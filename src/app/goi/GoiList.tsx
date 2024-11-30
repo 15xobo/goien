@@ -44,7 +44,7 @@ function NewGoiDialog({ open, onClose }: {
         <Dialog open={open}
             PaperProps={{
                 component: 'form',
-                sx: {width: 360}
+                sx: { width: 360 }
             }}>
             <DialogTitle>
                 New
@@ -84,8 +84,8 @@ function NewGoiDialog({ open, onClose }: {
                     color='success'
                     size="large"
                     disabled={goi.name.length === 0}
-                    onClick={() => {
-                        addGoi(goi!)
+                    onClick={async () => {
+                        await addGoi(goi!)
                         reset()
                         router.refresh()
                     }}
