@@ -59,8 +59,8 @@ function NewEnDialog({ open, onClose }: {
                 <IconButton
                     color='success'
                     disabled={en.name.length === 0}
-                    onClick={() => {
-                        addEn(en!)
+                    onClick={async () => {
+                        await addEn(en!)
                         reset()
                         router.refresh()
                     }}

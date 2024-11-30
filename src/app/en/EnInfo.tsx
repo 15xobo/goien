@@ -149,8 +149,8 @@ export default function EnInfo(
             <IconButton
                 disabled={!deletable}
                 color='primary'
-                onClick={() => {
-                    deleteEn(en.id!)
+                onClick={async () => {
+                    await deleteEn(en.id!)
                     router.push('/en/')
                 }}
             >
@@ -160,8 +160,8 @@ export default function EnInfo(
                 open={editing}
                 enName={newName}
                 onChange={(name) => setNewName(name)}
-                onConfirm={() => {
-                    udpateEn({ ...en, name: newName })
+                onConfirm={async () => {
+                    await udpateEn({ ...en, name: newName })
                     setEditing(false)
                     router.refresh()
                 }}
@@ -173,8 +173,8 @@ export default function EnInfo(
             <AddGoiDialog
                 open={addGoiDialogOpen}
                 selectedGoiId={goiIdToAdd}
-                onSelect={(goiId) => {
-                    attachGoi(en.id, goiId)
+                onSelect={async (goiId) => {
+                    await attachGoi(en.id, goiId)
                     setAddGoiDialogOpen(false)
                     setGoiIdToAdd('')
                     router.refresh()
@@ -190,8 +190,8 @@ export default function EnInfo(
                     gois[index] &&
                     <ListItem key={goiId}>
                         <ListItemIcon>
-                            <IconButton color="primary" onClick={() => {
-                                detachGoi(en.id, goiId)
+                            <IconButton color="primary" onClick={async () => {
+                                await detachGoi(en.id, goiId)
                                 router.refresh()
                             }}>
                                 <DeleteIcon color='primary' />

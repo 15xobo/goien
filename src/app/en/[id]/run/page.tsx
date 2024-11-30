@@ -18,7 +18,8 @@ function selectEntries(inputEntries: Array<GoiEntryData>): Array<GoiEntryData> {
 }
 
 export default async function EnRunPage({ params }: { params: { id: string } }) {
-    const enId = decodeURIComponent(params.id)
+    const { id } = await params;
+    const enId = decodeURIComponent(id)
     const en = await getEn(enId)
     const goiEntries = await Promise.all(en.goiIds.map(id => listEntries(id)))
         .then(entries => selectEntries(entries.flat()))

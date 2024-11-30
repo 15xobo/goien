@@ -1,32 +1,51 @@
 'use server'
 
 import { En } from "../lib/model"
-import { enClient } from "../lib/en"
+import { MongoClient } from "mongodb";
+import { randomUUID } from "crypto";
+
+function getDatabase() {
+    return new MongoClient(process.env.DB_CONNECTION_STRING!).db('goien');
+}
 
 export async function listEns() {
-    return enClient.listEns()
+    const database = getDatabase();
+    const goi_docs = await database.collection("ens").find({}).toArray();
+    return goi_docs.map(doc => ({ id: doc.id, name: doc.name, goiIds: doc.goi_ids }));
 }
 
 export async function getEn(id: string) {
-    return enClient.getEn(id)
+    const database = getDatabase();
+    const en_doc = await database.collection("ens").findOne({ id: id })
+    if (!en_doc) {
+        throw `goi ${id} is not found`
+    };
+    return { id: en_doc.id, name: en_doc.name, goiIds: en_doc.goi_ids };
 }
 
 export async function addEn(en: En) {
-    return enClient.addEn(en)
+    const database = getDatabase();
+    const id = randomUUID();
+    return database.collection("ens").insertOne({ id: id, name: en.name, goi_ids: en.goiIds });
+
 }
 
 export async function udpateEn(en: En) {
-    return enClient.updateEn(en)
+    const database = getDatabase();
+    return database.collection("ens").updateOne({ id: en.id }, { $set: { name: en.name } });
 }
 
 export async function deleteEn(id: string) {
-    return enClient.deleteEn(id)
+    const database = getDatabase();
+    return database.collection("ens").deleteOne({ id: id });
 }
 
 export async function attachGoi(id: string, goiId: string) {
-    await enClient.attachGoi(id, goiId)
+    const database = getDatabase();
+    return database.collection("ens").updateOne({ id: id }, { $addToSet: { 'goi_ids': goiId } });
 }
 
 export async function detachGoi(id: string, goiId: string) {
-    await enClient.detachGoi(id, goiId)
+    const database = getDatabase();
+    return database.collection("ens").updateOne({ id: id }, { $pull: { 'goi_ids': goiId } });
 }
