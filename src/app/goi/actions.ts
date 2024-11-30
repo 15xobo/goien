@@ -6,6 +6,7 @@ import { MongoClient } from "mongodb";
 import { randomUUID } from "crypto";
 
 function getDatabase() {
+    console.log("Connecting to Mongo: " + process.env.DB_CONNECTION_STRING);
     return new MongoClient(process.env.DB_CONNECTION_STRING!).db('goien');
 }
 
